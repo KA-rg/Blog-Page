@@ -8,6 +8,7 @@ const blogSchema = new Schema({
     type: String,
     required: true,
   },
+  headContent: String,
   content: String,
   author: String,
   image: {
@@ -15,10 +16,10 @@ const blogSchema = new Schema({
     url: String,
   },
   tags: [String],
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  views: { type: Number, default: 0 },   // 👈 for Most Reads
+  likes: { type: Number, default: 0 },   // 👈 for Popular
+  likedBy: [{ type: Schema.Types.ObjectId, ref: "User" }], // 👈 track users who liked
+  createdAt: { type: Date, default: Date.now }, // 👈 for Trending
 
   reviews: [
     {
@@ -34,7 +35,7 @@ const blogSchema = new Schema({
 
 blogSchema.post("findOneAndDelete", async (blog) => {
   if(blog) {
-    await Review.deleteMany({ _id: { $in: blog.review }});
+    await Review.deleteMany({ _id: { $in: blog.reviews }});
   }
 });
 
