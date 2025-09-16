@@ -1,0 +1,84 @@
+<% layout('layouts/boilerplate') %>
+
+<body>
+  <div class="row">
+    <div class="col-8 offset-2">
+       <h3>Create a new blog</h3>
+       <br>
+  <form method="POST" action="/blogs" novalidate class="needs-validation" enctype="multipart/form-data">
+    <!-- Title -->
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      <input name="blog[title]" placeholder="enter title" class="form-control" required>
+      <div class="valid-feedback">Looks good!</div>
+      <div class="invalid-feedback">Please choose a title.</div>
+    </div>
+
+    <!-- Head Content -->
+    <div class="mb-3">
+      <label for="headContent" class="form-label">Head Content</label>
+      <textarea name="blog[headContent]" placeholder="enter content which will appear on main page" class="form-control" required></textarea>
+      <div class="valid-feedback">Looks good!</div>
+      <div class="invalid-feedback">Please write a head content.</div>
+    </div>
+
+    <!-- Content -->
+    <div class="mb-3">
+      <label for="content" class="form-label">Content</label>
+      <textarea name="blog[content]" rows="13" placeholder="enter content in detail" class="form-control" required></textarea>
+      <div class="valid-feedback">Looks good!</div>
+      <div class="invalid-feedback">Content cannot be empty.</div>
+    </div>
+
+    <!-- Image -->
+    <div class="mb-3">
+      <label for="image" class="form-label">Upload blog image</label>
+      <input name="blog[image]" type="file" class="form-control" required>
+    </div>
+
+    <!-- Tags -->
+    <div class="mb-3">
+  <label class="form-label">Select Tags</label>
+  <div class="d-flex flex-wrap gap-3">
+    <% tagEnum.forEach(tag => { %>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          name="blog[tags]"
+          value="<%= tag %>"
+          id="tag-<%= tag %>"
+          <%= (blog && blog.tags && blog.tags.includes(tag)) ? "checked" : "" %>>
+        <label class="form-check-label" for="tag-<%= tag %>">
+          <%= tag %>
+        </label>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+    <div class="row">
+  <!-- Country -->
+  <div class="mb-3 col-md-8">
+    <label for="country" class="form-label">Country</label>
+    <input name="blog[country]" id="country" placeholder="enter country required" class="form-control" required>
+    <div class="valid-feedback">Looks good!</div>
+    <div class="invalid-feedback">Please choose a country.</div>
+  </div>
+
+  <!-- Author name -->
+  <div class="mb-3 col-md-4">
+    <label for="author" class="form-label">Author</label>
+    <input name="blog[author]" placeholder="enter author's name" class="form-control" required>
+    <div class="valid-feedback">Looks good!</div>
+    <div class="invalid-feedback">Please choose an author.</div>
+  </div>
+</div>
+
+
+    <button class="btn btn-dark add-btn">Add</button>
+    <br><br>
+  </form>
+  </div>
+  </div>
+</body>

@@ -15,10 +15,13 @@ const blogSchema = new Schema({
     filename: String,
     url: String,
   },
-  tags: [String],
+  tags: [{
+    type: String,
+    enum: ["Travel", "Food", "Tech", "Health", "Education", "Sports"], // fixed list
+  }],
   views: { type: Number, default: 0 },   // 👈 for Most Reads
-  likes: { type: Number, default: 0 },   // 👈 for Popular
-  likedBy: [{ type: Schema.Types.ObjectId, ref: "User" }], // 👈 track users who liked
+  likes: { type: Number, default: 0 },  
+  likedBy: { type: [Schema.Types.ObjectId], ref: "User", default: [] },  // 👈 track users who liked
   createdAt: { type: Date, default: Date.now }, // 👈 for Trending
 
   reviews: [
