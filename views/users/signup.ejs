@@ -1,51 +1,80 @@
 <% layout('layouts/boilerplate') %>
 
-<div class="row justify-content-center align-items-start" style="min-height: 75vh; padding-top: 40px;">
-  <div class="col-md-4"> <!-- thinner column -->
-    <div class="card shadow p-4">
-      <h2 class="text-center mb-4">Sign Up</h2>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh; background-color: #f8f9fa;">
+  <div class="col-md-5 col-lg-4">
+    <div class="card shadow-lg rounded-4 border-0 p-4">
+      <h2 class="text-center mb-4 fw-bold text-primary">Sign Up</h2>
+
       <form action="/signup" method="POST" class="needs-validation" novalidate>
+
+        <!-- Username -->
         <div class="mb-3">
-          <label for="username" class="form-label">Username</label>
           <input
             name="username"
             id="username"
             type="text"
-            class="form-control"
-            placeholder="Choose a username"
+            class="form-control form-control-lg rounded-3"
+            placeholder="Username"
             required
           />
+          <div class="invalid-feedback">Please enter a username.</div>
         </div>
 
+        <!-- Email -->
         <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
           <input
             name="email"
             id="email"
             type="email"
-            class="form-control"
-            placeholder="Enter your email"
+            class="form-control form-control-lg rounded-3"
+            placeholder="Email"
             required
           />
+          <div class="invalid-feedback">Please enter a valid email address.</div>
         </div>
 
+        <!-- Password -->
         <div class="mb-3">
-          <label for="password" class="form-label">Password</label>
           <input
             name="password"
             id="password"
             type="password"
-            class="form-control"
-            placeholder="Create a password"
+            class="form-control form-control-lg rounded-3"
+            placeholder="Password"
             required
           />
+          <div class="invalid-feedback">Please enter a password.</div>
         </div>
 
-        <button type="submit" class="btn btn-success w-100 mb-3">Sign Up</button>
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 mb-3">
+          Create Account
+        </button>
       </form>
-      <p class="text-center">
-        Already have an account? <a href="/login" class="text-decoration-none">Login</a>
+
+      <!-- Divider -->
+      <hr class="my-3">
+
+      <!-- Login Link -->
+      <p class="text-center mb-0">
+        Already have an account? <a href="/login" class="fw-semibold text-primary">Login</a>
       </p>
     </div>
   </div>
 </div>
+
+<script>
+  (function () {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+  })()
+</script>

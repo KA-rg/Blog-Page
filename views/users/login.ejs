@@ -1,35 +1,75 @@
 <% layout('layouts/boilerplate') %>
 
-<div class="row justify-content-center align-items-start" style="min-height: 70vh; padding-top: 30px;">
-  <div class="col-md-4">
-    <div class="card shadow-sm p-4">
-      <h2 class="text-center mb-3">Login</h2>
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh; background-color: #f8f9fa;">
+  <div class="col-md-5 col-lg-4">
+    <div class="card shadow-lg rounded-4 border-0 p-4">
+      <h2 class="text-center mb-4 fw-bold text-primary">Login</h2>
+
       <form action="/login" method="POST" class="needs-validation" novalidate>
+
+        <!-- Username -->
         <div class="mb-3">
           <input
             name="username"
             id="username"
             type="text"
-            class="form-control"
+            class="form-control form-control-lg rounded-3"
             placeholder="Username"
             required
           />
+          <div class="invalid-feedback">Please enter your username.</div>
         </div>
-        <div class="mb-3">
-          <input
-            name="password"
-            id="password"
-            type="password"
-            class="form-control"
-            placeholder="Password"
-            required
-          />
-        </div>
-        <button type="submit" class="btn btn-success w-100">Login</button>
+
+       <!-- Password -->
+<div class="mb-3">
+  <input
+    name="password"
+    id="password"
+    type="password"
+    class="form-control form-control-lg rounded-3"
+    placeholder="Password"
+    required
+  />
+  <div class="invalid-feedback">Please enter your password.</div>
+
+  <!-- Forgot password link -->
+  <div class="d-flex justify-content-end mt-1">
+    <a href="/forgot" class="text-decoration-none text-primary fw-semibold" style="font-size: 0.85rem;">
+      Forgot password?
+    </a>
+  </div>
+</div>
+
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 mb-3">
+          Login
+        </button>
       </form>
-      <p class="text-center mt-3 mb-0">
-        Don’t have an account? <a href="/signup">Sign up</a>
+
+      <!-- Divider -->
+      <hr class="my-3">
+
+      <!-- Signup Link -->
+      <p class="text-center mb-0">
+        Don’t have an account? <a href="/signup" class="fw-semibold text-primary">Sign up</a>
       </p>
     </div>
   </div>
 </div>
+
+<script>
+  (function () {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms).forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+        }
+        form.classList.add('was-validated')
+      }, false)
+    })
+  })()
+</script>
