@@ -3,13 +3,11 @@ const Schema = mongoose.Schema;
 const passportLocalMongoose = require("passport-local-mongoose");
 
 const userSchema = new Schema({
-  email: {
-    type: String,
-    required: true,
-  },
   blogs: [{ type: Schema.Types.ObjectId, ref: "Blog" }],
-  reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }]
-
+  reviews: [{ type: Schema.Types.ObjectId, ref: "Review" }],
+  email: { type: String, required: true, unique: true },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
 });
 
 userSchema.plugin(passportLocalMongoose);

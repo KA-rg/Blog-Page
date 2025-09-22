@@ -122,3 +122,90 @@ module.exports.updateProfile = async (req, res, next) => {
     res.redirect("/users/edit");
   }
 };
+
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+
+// Render forgot password form
+module.exports.renderForgotForm = (req,res) => {
+  res.render("users/forgot", {
+    errorMessages: req.flash("error"),
+    successMessages: req.flash("success")
+  });
+};
+
+// Handle forgot password
+module.exports.forgotPassword = async (req,res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    req.flash("error", "No account with that email found.");
+    return res.redirect("/forgot");
+  }
+
+  // Generate token
+  const token = crypto.randomBytes(20).toString("hex");
+
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+  await user.save();
+
+  // Send email
+  const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+
+  const mailOptions = {
+    to: user.email,
+    from: process.env.EMAIL_USER,
+    subject: "Password Reset",
+    text: `You are receiving this because you requested a password reset.\n\n
+      Please click the following link to reset your password:\n\n
+      http://${req.headers.host}/reset/${token}\n\n
+      This link will expire in 1 hour.\n`
+  };
+
+  await transporter.sendMail(mailOptions);
+
+  req.flash("success", "An email has been sent with password reset instructions.");
+  res.redirect("/forgot");
+};
+
+// render reset form
+module.exports.renderResetPasswordForm = (req, res) => {
+  res.render("users/reset", {
+    token: req.params.token,           // your reset token
+    errorMessages: req.flash("error"), // pass error flash messages
+    successMessages: req.flash("success") // pass success flash messages
+  });
+};
+
+// Handle reset
+module.exports.resetPassword = async (req,res) => {
+  const user = await User.findOne({ 
+    resetPasswordToken: req.params.token,
+    resetPasswordExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    req.flash("error", "Password reset token is invalid or has expired.");
+    return res.redirect("/forgot");
+  }
+
+  if (req.body.password !== req.body.confirm) {
+    req.flash("error", "Passwords do not match.");
+    return res.redirect(`/reset/${req.params.token}`);
+  }
+
+  await user.setPassword(req.body.password);
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  req.flash("success", "Password has been reset! You can now login.");
+  res.redirect("/login");
+};

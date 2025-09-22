@@ -1,0 +1,58 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 rounded-4 p-4">
+        <h3 class="fw-bold mb-4 text-center">Reset Password</h3>
+
+        <% if (errorMessages && errorMessages.length) { %>
+          <div class="alert alert-danger">
+            <% errorMessages.forEach(msg => { %><p class="mb-0"><%= msg %></p><% }) %>
+          </div>
+        <% } %>
+
+        <form action="/reset/<%= token %>" method="POST" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label for="password" class="form-label fw-semibold">New Password</label>
+            <input type="password" name="password" id="password" class="form-control" required>
+            <div class="invalid-feedback">Please enter a new password.</div>
+          </div>
+          <div class="mb-3">
+            <label for="confirm" class="form-label fw-semibold">Confirm New Password</label>
+            <input type="password" name="confirm" id="confirm" class="form-control" required>
+            <div class="invalid-feedback">Passwords do not match.</div>
+          </div>
+          <button type="submit" class="btn btn-dark w-100 rounded-3">Reset Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const form = document.querySelector('.needs-validation');
+    const password = document.getElementById('password');
+    const confirm = document.getElementById('confirm');
+
+    form.addEventListener('submit', function (event) {
+      let invalid = false;
+
+      if (!form.checkValidity()) invalid = true;
+      if(password.value !== confirm.value) {
+        confirm.classList.add('is-invalid');
+        invalid = true;
+      } else {
+        confirm.classList.remove('is-invalid');
+      }
+
+      if(invalid) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      form.classList.add('was-validated');
+    }, false);
+  })();
+</script>

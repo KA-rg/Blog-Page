@@ -1,5 +1,12 @@
 <% layout('layouts/boilerplate') %>
 
+<style>
+  .btn-forgot {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+  }
+</style>
+
 <div class="container my-5">
   <div class="row justify-content-center">
     <div class="col-lg-6">
@@ -54,44 +61,66 @@
 
             <hr class="my-4">
 
-            <!-- Current Password -->
-            <div class="mb-3">
-              <label for="currentPassword" class="form-label fw-semibold">Current Password</label>
-              <input 
-                type="password" 
-                name="currentPassword" 
-                id="currentPassword"
-                class="form-control <%= passwordError.length ? 'is-invalid' : '' %>"
-                placeholder="Enter current password">
-              <% if (passwordError.length) { %>
-                <div class="invalid-feedback"><%= passwordError[0] %></div>
-              <% } %>
+            <!-- Forgot Password Button -->
+            <div class="mb-3 text-center">
+              <a href="/forgot" class="btn btn-outline-warning w-100">
+                Forgot Password?
+              </a>
             </div>
 
-            <!-- New Password -->
-            <div class="mb-3">
-              <label for="newPassword" class="form-label fw-semibold">New Password</label>
-              <input 
-                type="password" 
-                name="newPassword" 
-                id="newPassword"
-                class="form-control"
-                placeholder="Enter new password">
+            <!-- Change Password Button -->
+            <div class="mb-3 text-center">
+              <button type="button" class="btn btn-outline-primary w-100" id="togglePasswordBtn">
+                Change / Reset Password
+              </button>
             </div>
 
-            <!-- Confirm Password -->
-            <div class="mb-3">
-              <label for="confirmPassword" class="form-label fw-semibold">Confirm New Password</label>
-              <input 
-                type="password" 
-                name="confirmPassword" 
-                id="confirmPassword"
-                class="form-control"
-                placeholder="Re-enter new password">
+            <!-- Password Section (hidden by default) -->
+            <div id="passwordSection" style="display: none;">
+
+              <!-- Current Password -->
+              <div class="mb-3">
+                <label for="currentPassword" class="form-label fw-semibold">Current Password</label>
+                <input 
+                  type="password" 
+                  name="currentPassword" 
+                  id="currentPassword"
+                  class="form-control <%= passwordError.length ? 'is-invalid' : '' %>"
+                  placeholder="Enter current password">
+                <% if (passwordError.length) { %>
+                  <div class="invalid-feedback"><%= passwordError[0] %></div>
+                <% } %>
+                <div class="invalid-feedback">Please enter a old password</div>
+              </div>
+
+              <!-- New Password -->
+              <div class="mb-3">
+                <label for="newPassword" class="form-label fw-semibold">New Password</label>
+                <input 
+                  type="password" 
+                  name="newPassword" 
+                  id="newPassword"
+                  class="form-control"
+                  placeholder="Enter new password">
+                  <div class="invalid-feedback">Please enter a new password</div>
+              </div>
+
+              <!-- Confirm Password -->
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label fw-semibold">Confirm New Password</label>
+                <input 
+                  type="password" 
+                  name="confirmPassword" 
+                  id="confirmPassword"
+                  class="form-control"
+                  placeholder="Re-enter new password">
+                  <div class="invalid-feedback">Passwords do not match</div>
+              </div>
+
             </div>
 
             <!-- Submit -->
-            <button type="submit" class="btn btn-dark w-100 rounded-3">Save Changes</button>
+            <button type="submit" class="btn btn-dark w-100 rounded-3 mt-3">Save Changes</button>
           </form>
         </div>
       </div>
@@ -100,21 +129,78 @@
 </div>
 
 <script>
+  // Toggle password section
+  const toggleBtn = document.getElementById('togglePasswordBtn');
+  const passwordSection = document.getElementById('passwordSection');
+
+  const currentPass = document.getElementById('currentPassword');
+  const newPass = document.getElementById('newPassword');
+  const confirmPass = document.getElementById('confirmPassword');
+
+  toggleBtn.addEventListener('click', () => {
+    if(passwordSection.style.display === 'none') {
+      passwordSection.style.display = 'block';
+      toggleBtn.textContent = "Cancel Password Change";
+      // Make fields required dynamically
+      currentPass.required = true;
+      newPass.required = true;
+      confirmPass.required = true;
+    } else {
+      passwordSection.style.display = 'none';
+      toggleBtn.textContent = "Change / Reset Password";
+      // Clear fields & remove invalid classes
+      [currentPass, newPass, confirmPass].forEach(el => {
+        el.value = '';
+        el.classList.remove('is-invalid');
+        el.required = false; // Remove required when hidden
+      });
+    }
+  });
+
+  // Form validation
   (function () {
     'use strict'
     const form = document.querySelector('.needs-validation');
-    const newPass = document.getElementById('newPassword');
-    const confirmPass = document.getElementById('confirmPassword');
 
     form.addEventListener('submit', function (event) {
-      if (!form.checkValidity() || (newPass.value && newPass.value !== confirmPass.value)) {
+      let passwordOpened = passwordSection.style.display !== 'none';
+      let invalid = false;
+
+      // Standard Bootstrap validation
+      if (!form.checkValidity()) {
+        invalid = true;
+      }
+
+      // Password section validation if open
+      if(passwordOpened) {
+        if(!currentPass.value) {
+          currentPass.classList.add('is-invalid');
+          invalid = true;
+        } else {
+          currentPass.classList.remove('is-invalid');
+        }
+
+        if(!newPass.value) {
+          newPass.classList.add('is-invalid');
+          invalid = true;
+        } else {
+          newPass.classList.remove('is-invalid');
+        }
+
+        if(!confirmPass.value || newPass.value !== confirmPass.value) {
+          confirmPass.classList.add('is-invalid');
+          invalid = true;
+        } else {
+          confirmPass.classList.remove('is-invalid');
+        }
+      }
+
+      if(invalid) {
         event.preventDefault();
         event.stopPropagation();
-        confirmPass.setCustomValidity("Passwords do not match");
-      } else {
-        confirmPass.setCustomValidity("");
       }
+
       form.classList.add('was-validated');
     }, false);
-  })()
+  })();
 </script>

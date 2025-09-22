@@ -1,0 +1,48 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 rounded-4 p-4">
+        <h3 class="fw-bold mb-4 text-center">Forgot Password</h3>
+
+        <% if (errorMessages && errorMessages.length) { %>
+          <div class="alert alert-danger">
+            <% errorMessages.forEach(msg => { %><p class="mb-0"><%= msg %></p><% }) %>
+          </div>
+        <% } %>
+
+        <% if (successMessages && successMessages.length) { %>
+          <div class="alert alert-success">
+            <% successMessages.forEach(msg => { %><p class="mb-0"><%= msg %></p><% }) %>
+          </div>
+        <% } %>
+
+        <form action="/forgot" method="POST" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label for="email" class="form-label fw-semibold">Email address</label>
+            <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required>
+            <div class="invalid-feedback">Please enter a valid email.</div>
+          </div>
+          <button type="submit" class="btn btn-dark w-100 rounded-3">Send Reset Link</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation');
+    forms.forEach(form => {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+</script>

@@ -34,4 +34,13 @@ router.post("/users/edit", isLoggedIn, userController.updateProfile);
 // Logout
 router.get("/logout", userController.logout);
 
+// Forgot password form
+router.get("/forgot", userController.renderForgotForm);
+router.post("/forgot", userController.forgotPassword);
+
+// Reset password form (link from email)
+router.get("/reset/:token", userController.renderResetPasswordForm);
+router.post("/reset/:token", userController.resetPassword);
+
+
 module.exports = router;
