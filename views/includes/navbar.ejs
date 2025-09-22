@@ -1,0 +1,108 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top custom-navbar">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="/">MyBlog</a>
+
+    <!-- Toggler for mobile -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Right aligned items -->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/blogs">Blogs</a>
+        </li>
+
+        <!-- Categories Dropdown -->
+        <li class="nav-item dropdown hover-dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false">
+            Categories
+          </a>
+          <ul class="dropdown-menu dropdown-menu-custom" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="/category/tech">Tech</a></li>
+            <li><a class="dropdown-item" href="/category/lifestyle">Lifestyle</a></li>
+            <li><a class="dropdown-item" href="/category/travel">Travel</a></li>
+          </ul>
+        </li>
+
+        <% if (!currUser) { %>
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+          </li>
+        <% } else { %>
+          <!-- User Dropdown -->
+          <li class="nav-item dropdown hover-dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+              👤 <%= currUser.username %>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-custom" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="/profile">Profile</a></li>
+              <li><a class="dropdown-item" href="blogs/saved">Saved</a></li>
+              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+            </ul>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Bootstrap JS (needed for dropdowns & toggler) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<style>
+/* Navbar Styling with Palette */
+.custom-navbar {
+  background: #002855 !important; /* Deep Blue */
+  backdrop-filter: blur(6px);
+  z-index: 1050;
+}
+
+.navbar-brand {
+  color: #0466c8 !important; /* Bright Blue */
+}
+
+.navbar-nav .nav-link {
+  color: #e0e0e0 !important; /* Light gray text */
+  transition: color 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+  color: #0466c8 !important; /* Accent Blue on hover */
+}
+
+/* Dropdown Styling */
+.dropdown-menu-custom {
+  background-color: #001233; /* Dark navy */
+  border: none;
+  border-radius: 8px;
+}
+
+.dropdown-item {
+  color: #d0d0d0;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #0353a4; /* Medium blue */
+  color: #ffffff;
+}
+
+/* Hover Dropdown for Desktop */
+@media (min-width: 992px) {
+  .hover-dropdown:hover .dropdown-menu {
+    display: block;
+    margin-top: 0; /* align properly */
+  }
+}
+</style>

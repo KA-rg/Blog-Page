@@ -21,13 +21,65 @@ module.exports.index = async (req, res, next) => {
     const blogs = await Blog.find({});
     const allTags = [...new Set(blogs.flatMap(blog => blog.tags))];
 
-  res.render("blogs/index", { allBlog, search, trending, mostReads, popular, allTags });
+  res.render("blogs/index", { allBlog, blogs, search, trending, mostReads, popular, allTags });
+};
+
+module.exports.saveBlog = async (req, res) => {
+ try {
+    if (!req.user) {
+      return res.status(401).json({ error: "You must be logged in to save blogs" });
+    }
+
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ error: "Blog not found" });
+
+    const userId = req.user._id;
+    const alreadySaved = blog.savedBy.some(id => id.toString() === userId.toString());
+
+    if (alreadySaved) {
+      // Unsave
+      blog.savedBy = blog.savedBy.filter(id => id.toString() !== userId.toString());
+      await blog.save();
+      return res.json({ saved: false });
+    } else {
+      // Save
+      blog.savedBy.push(userId);
+      await blog.save();
+      return res.json({ saved: true });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+};
+
+module.exports.savedBlog = async (req,res) => {
+   try {
+    if (!req.user) {
+      req.flash("error", "You must be logged in to view saved blogs.");
+      return res.redirect("/login");
+    }
+
+    // Fetch saved blogs
+    const blogs = await Blog.find({ savedBy: req.user._id });
+
+    // Fetch most liked blogs for suggestions
+    const suggestions = await Blog.find({})
+      .sort({ likes: -1 }) // highest likes first
+      .limit(4); // limit to 4 suggestions
+
+    res.render("blogs/saved", { blogs, suggestions, currUser: req.user });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Something went wrong!");
+    res.redirect("/blogs");
+  }
 };
 
 module.exports.renderNewForm = async (req,res) => { 
-   const blogs = await Blog.find({});
-    const allTags = [...new Set(blogs.flatMap(blog => blog.tags))];
-  res.render("blogs/new", { allTags });
+   const tagEnum = Blog.schema.path("tags").caster.enumValues;
+res.render("blogs/new", { tagEnum, blog: { tags: [] } });
+
 };
 
 module.exports.likeBlog = async (req, res) => {
@@ -76,7 +128,59 @@ module.exports.showBlog = async (req, res, next) => {
     blog.views += 1; // increment views
     await blog.save();
 
-    res.render("blogs/show", { blog });
+    // Step 1: Try to fetch related blogs
+  let relatedBlogs = await Blog.find({
+    _id: { $ne: id },
+    tags: { $in: blog.tags }
+  }).limit(8);
+
+  // Step 2: If not enough, fetch random blogs to fill
+  if (relatedBlogs.length < 8) {
+    const moreBlogs = await Blog.find({ _id: { $ne: id } })
+      .limit(8 - relatedBlogs.length);
+
+    // merge related + random (avoid duplicates)
+    const existingIds = relatedBlogs.map(b => b._id.toString());
+    moreBlogs.forEach(b => {
+      if (!existingIds.includes(b._id.toString())) {
+        relatedBlogs.push(b);
+      }
+    });
+  }
+
+
+
+  // // Fetch related blogs for sidebar
+  // let relatedBlogs = await Blog.find({
+  //   _id: { $ne: blog._id },
+  //   tags: { $in: blog.tags }
+  // }).limit(8);
+
+  // if (relatedBlogs.length < 8) {
+  //   const extra = await Blog.find({ _id: { $ne: blog._id } })
+  //     .limit(8 - relatedBlogs.length);
+  //   relatedBlogs = relatedBlogs.concat(extra);
+  // }
+
+  // // Find previous and next blogs (based on createdAt)
+  // const prevBlog = await Blog.findOne({ createdAt: { $lt: blog.createdAt } })
+  //   .sort({ createdAt: -1 });
+  // const nextBlog = await Blog.findOne({ createdAt: { $gt: blog.createdAt } })
+  //   .sort({ createdAt: 1 });
+
+
+
+  // All blogs (sorted by date for navigation)
+  const blogs = await Blog.find().sort({ createdAt: 1 });
+
+  // Find index of current blog
+  const index = blogs.findIndex(b => b._id.toString() === blog._id.toString());
+
+  // Previous and next blogs
+  const prevBlog = index > 0 ? blogs[index - 1] : null;
+  const nextBlog = index < blogs.length - 1 ? blogs[index + 1] : null;
+
+    res.render("blogs/show", { blog, blogs, prevBlog, nextBlog });
   } catch (err) {
     next(err);
   }

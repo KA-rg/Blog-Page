@@ -1,0 +1,90 @@
+<% layout('layouts/boilerplate') %>
+
+<body>
+  <div class="row">
+    <div class="col-8 offset-2">
+      <h3>Edit Blog</h3>
+      <br>
+      <form method="POST" action="/blogs/<%= blog._id %>?_method=PUT" novalidate class="needs-validation" enctype="multipart/form-data">
+
+        <!-- Title -->
+        <div class="mb-3">
+          <label for="title" class="form-label">Title</label>
+          <input name="blog[title]" value="<%= blog.title %>" class="form-control" required>
+          <div class="valid-feedback">Looks good!</div>
+          <div class="invalid-feedback">Please choose a title.</div>
+        </div>
+
+        <!-- Head Content -->
+        <div class="mb-3">
+          <label for="headContent" class="form-label">Head Content</label>
+          <textarea name="blog[headContent]" class="form-control" required><%= blog.headContent %></textarea>
+          <div class="valid-feedback">Looks good!</div>
+          <div class="invalid-feedback">Please write a head content.</div>
+        </div>
+
+        <!-- Content -->
+        <div class="mb-3">
+          <label for="content" class="form-label">Content</label>
+          <textarea name="blog[content]" rows="13" class="form-control" required><%= blog.content %></textarea>
+          <div class="valid-feedback">Looks good!</div>
+          <div class="invalid-feedback">Content cannot be empty.</div>
+        </div>
+
+        <!-- Image -->
+        <div class="mb-3">
+          <label for="image" class="form-label">Upload new image (optional)</label>
+          <input name="blog[image]" type="file" class="form-control">
+          <% if (blog.image && blog.image.url) { %>
+            <p class="mt-2">Current image:</p>
+            <img src="<%= blog.image.url %>" alt="<%= blog.title %>" class="img-fluid rounded" style="max-height: 200px;">
+          <% } %>
+        </div>
+
+        <!-- Tags -->
+        <div class="mb-3">
+          <label class="form-label">Select Tags</label>
+          <div class="d-flex flex-wrap gap-3">
+            <% tagEnum.forEach(tag => { %>
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="blog[tags]"
+                  value="<%= tag %>"
+                  id="tag-<%= tag %>"
+                  <%= blog.tags.includes(tag) ? "checked" : "" %>>
+                <label class="form-check-label" for="tag-<%= tag %>">
+                  <%= tag %>
+                </label>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+
+        <!-- Country + Author row -->
+        <div class="row">
+          <!-- Country -->
+          <div class="mb-3 col-md-8">
+            <label for="country" class="form-label">Country</label>
+            <input name="blog[country]" id="country" value="<%= blog.country %>" class="form-control" required>
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">Please choose a country.</div>
+          </div>
+
+          <!-- Author -->
+          <div class="mb-3 col-md-4">
+            <label for="author" class="form-label">Author</label>
+            <input name="blog[author]" value="<%= blog.author %>" class="form-control" required>
+            <div class="valid-feedback">Looks good!</div>
+            <div class="invalid-feedback">Please choose an author.</div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button class="btn btn-dark add-btn">Update</button>
+        <br><br>
+      </form>
+    </div>
+  </div>
+</body>

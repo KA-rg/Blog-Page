@@ -17,12 +17,13 @@ const blogSchema = new Schema({
   },
   tags: [{
     type: String,
-    enum: ["Travel", "Food", "Tech", "Health", "Education", "Sports"], // fixed list
+    enum: ["Travel", "Food", "Tech", "Health", "Education", "Sports", "Music", "Culture", "Wellness", "Awareness", "Work", "Technology", "Lifestyle", "Fitness", "Adventure", "Budget"], // fixed list
   }],
   views: { type: Number, default: 0 },   // 👈 for Most Reads
   likes: { type: Number, default: 0 },  
   likedBy: { type: [Schema.Types.ObjectId], ref: "User", default: [] },  // 👈 track users who liked
   createdAt: { type: Date, default: Date.now }, // 👈 for Trending
+  savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
   reviews: [
     {

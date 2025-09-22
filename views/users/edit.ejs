@@ -1,0 +1,120 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4">
+          <h3 class="fw-bold mb-4 text-center">Edit Profile</h3>
+
+          <!-- Flash messages -->
+          <% if (errorMessages && errorMessages.length) { %>
+            <div class="alert alert-danger">
+              <% errorMessages.forEach(msg => { %><p class="mb-0"><%= msg %></p><% }) %>
+            </div>
+          <% } %>
+
+          <% if (successMessages && successMessages.length) { %>
+            <div class="alert alert-success">
+              <% successMessages.forEach(msg => { %><p class="mb-0"><%= msg %></p><% }) %>
+            </div>
+          <% } %>
+
+          <form action="/users/edit" method="POST" class="needs-validation" novalidate>
+
+            <!-- Username -->
+            <div class="mb-3">
+              <label for="username" class="form-label fw-semibold">Username</label>
+              <input 
+                type="text" 
+                name="username" 
+                id="username"
+                class="form-control <%= usernameError.length ? 'is-invalid' : '' %>"
+                value="<%= user.username %>"
+                required>
+              <% if (usernameError.length) { %>
+                <div class="invalid-feedback"><%= usernameError[0] %></div>
+              <% } %>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label fw-semibold">Email</label>
+              <input 
+                type="email" 
+                name="email" 
+                id="email"
+                class="form-control <%= emailError.length ? 'is-invalid' : '' %>"
+                value="<%= user.email %>"
+                required>
+              <% if (emailError.length) { %>
+                <div class="invalid-feedback"><%= emailError[0] %></div>
+              <% } %>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Current Password -->
+            <div class="mb-3">
+              <label for="currentPassword" class="form-label fw-semibold">Current Password</label>
+              <input 
+                type="password" 
+                name="currentPassword" 
+                id="currentPassword"
+                class="form-control <%= passwordError.length ? 'is-invalid' : '' %>"
+                placeholder="Enter current password">
+              <% if (passwordError.length) { %>
+                <div class="invalid-feedback"><%= passwordError[0] %></div>
+              <% } %>
+            </div>
+
+            <!-- New Password -->
+            <div class="mb-3">
+              <label for="newPassword" class="form-label fw-semibold">New Password</label>
+              <input 
+                type="password" 
+                name="newPassword" 
+                id="newPassword"
+                class="form-control"
+                placeholder="Enter new password">
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mb-3">
+              <label for="confirmPassword" class="form-label fw-semibold">Confirm New Password</label>
+              <input 
+                type="password" 
+                name="confirmPassword" 
+                id="confirmPassword"
+                class="form-control"
+                placeholder="Re-enter new password">
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-dark w-100 rounded-3">Save Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    'use strict'
+    const form = document.querySelector('.needs-validation');
+    const newPass = document.getElementById('newPassword');
+    const confirmPass = document.getElementById('confirmPassword');
+
+    form.addEventListener('submit', function (event) {
+      if (!form.checkValidity() || (newPass.value && newPass.value !== confirmPass.value)) {
+        event.preventDefault();
+        event.stopPropagation();
+        confirmPass.setCustomValidity("Passwords do not match");
+      } else {
+        confirmPass.setCustomValidity("");
+      }
+      form.classList.add('was-validated');
+    }, false);
+  })()
+</script>

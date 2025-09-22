@@ -1,0 +1,390 @@
+<% layout('layouts/boilerplate') %>
+
+<!-- Hero Section -->
+<section class="hero-section text-center text-light d-flex flex-column justify-content-center align-items-center">
+  <div class="container">
+    <h1 class="display-4 fw-bold mb-3">Welcome to <span class="text-accent">FailSTORY</span></h1>
+    <p class="lead mb-4">Your daily dose of stories, blogs, and insights.</p>
+    <a href="/blogs" class="btn btn-accent btn-lg">Explore Blogs</a>
+  </div>
+</section>
+
+<!-- ========== TRENDING ========== -->
+<div class="container my-5">
+  <h3 class="section-title mb-4 text-accent">🔥 Trending</h3>
+  <div class="row g-4 row-cols-lg-4 row-cols-md-2 row-cols-1">
+    <% trending.forEach(blog => { %>
+      <div class="col blog-card">
+        <div class="card listing-card shadow-sm h-100 position-relative">
+
+          <!-- More Options -->
+          <div class="dropdown more-options">
+            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">⋮</button>
+            <ul class="dropdown-menu">
+              <li><button class="dropdown-item share-btn" data-url="/blogs/<%= blog._id %>">📤 Share</button></li>
+              <li>
+                <button 
+                  class="dropdown-item save-btn" 
+                  data-id="<%= blog._id %>"
+                  data-saved="<%= currUser && blog.savedBy && blog.savedBy.some(id => id && id.toString() === currUser._id.toString()) ? 'true' : 'false' %>"
+                >
+                  <% if (currUser && blog.savedBy && blog.savedBy.some(id => id && id.toString() === currUser._id.toString())) { %>
+                    ✅ Saved
+                  <% } else { %>
+                    💾 Save
+                  <% } %>
+                </button>
+              </li>
+              <li>
+                  <a class="dropdown-item" href="/blogs/<%= blog._id %>">
+                    🔎 View Blog
+                  </a>
+                </li>
+            </ul>
+          </div>
+
+          <!-- Blog Image -->
+          <a href="/blogs/<%= blog._id %>" class="listing-link">
+            <% if (blog.image) { %>
+              <img src="<%= blog.image.url %>" class="card-img-top" alt="<%= blog.title %>">
+            <% } else { %>
+              <div class="card-img-placeholder"></div>
+            <% } %>
+            <div class="card-body p-3">
+              <h6 class="card-title fw-bold"><%= blog.title %></h6>
+              <p class="card-text text-muted small mb-0"><%= blog.headContent %></p>
+            </div>
+          </a>
+
+          <!-- Like Button -->
+          <button class="btn btn-sm like-btn" data-id="<%= blog._id %>">
+            <span class="heart">
+              <% if (currUser && blog.likedBy && blog.likedBy.some(id => id && id.toString() === currUser._id.toString())) { %>
+                ❤️
+              <% } else { %>
+                🤍
+              <% } %>
+            </span>
+            <span class="like-count"><%= blog.likes %></span>
+          </button>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- ========== MOST READS ========== -->
+<div class="container my-5">
+  <h3 class="section-title mb-4 text-accent">📖 Most Reads</h3>
+  <div class="row g-4 row-cols-lg-4 row-cols-md-2 row-cols-1">
+    <% mostReads.forEach(blog => { %>
+      <div class="col blog-card">
+        <div class="card listing-card shadow-sm h-100 position-relative">
+
+          <!-- More Options -->
+          <div class="dropdown more-options">
+            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">⋮</button>
+            <ul class="dropdown-menu">
+              <li><button class="dropdown-item share-btn" data-url="/blogs/<%= blog._id %>">📤 Share</button></li>
+              <li>
+                <button 
+                  class="dropdown-item save-btn" 
+                  data-id="<%= blog._id %>"
+                  data-saved="<%= currUser && blog.savedBy && blog.savedBy.some(id => id && id.toString() === currUser._id.toString()) ? 'true' : 'false' %>"
+                >
+                  <% if (currUser && blog.savedBy && blog.savedBy.some(id => id && id.toString() === currUser._id.toString())) { %>
+                    ✅ Saved
+                  <% } else { %>
+                    💾 Save
+                  <% } %>
+                </button>
+              </li>
+              <li>
+                  <a class="dropdown-item" href="/blogs/<%= blog._id %>">
+                    🔎 View Blog
+                  </a>
+                </li>
+            </ul>
+          </div>
+
+          <a href="/blogs/<%= blog._id %>">
+            <% if (blog.image) { %>
+              <img src="<%= blog.image.url %>" class="card-img-top" alt="<%= blog.title %>">
+            <% } else { %>
+              <div class="card-img-placeholder"></div>
+            <% } %>
+            <div class="card-body p-3">
+              <h6 class="card-title fw-bold"><%= blog.title %></h6>
+              <p class="card-text text-muted small mb-0"><%= blog.headContent %></p>
+            </div>
+          </a>
+
+          <!-- Like Button -->
+          <button class="btn btn-sm like-btn" data-id="<%= blog._id %>">
+            <span class="heart">
+              <% if (currUser && blog.likedBy && blog.likedBy.some(id => id && id.toString() === currUser._id.toString())) { %>
+                ❤️
+              <% } else { %>
+                🤍
+              <% } %>
+            </span>
+            <span class="like-count"><%= blog.likes %></span>
+          </button>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- ========== POPULAR ========== -->
+<div class="container my-5">
+  <h3 class="section-title mb-4 text-accent">⭐ Popular</h3>
+  <div class="row g-4 row-cols-lg-4 row-cols-md-2 row-cols-1">
+    <% popular.forEach(blog => { %>
+      <div class="col blog-card">
+        <div class="card listing-card shadow-sm h-100 position-relative">
+
+          <!-- More Options -->
+          <div class="dropdown more-options">
+            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">⋮</button>
+            <ul class="dropdown-menu">
+              <li><button class="dropdown-item share-btn" data-url="/blogs/<%= blog._id %>">📤 Share</button></li>
+              <li>
+  <button 
+    class="dropdown-item save-btn" 
+    data-id="<%= blog._id %>" 
+    data-saved="<%= currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString()) ? 'true' : 'false' %>">
+    <% if (currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString())) { %>
+      ✅ Saved
+    <% } else { %>
+      💾 Save
+    <% } %>
+  </button>
+</li>
+<li>
+                  <a class="dropdown-item" href="/blogs/<%= blog._id %>">
+                    🔎 View Blog
+                  </a>
+                </li>
+                
+            </ul>
+          </div>
+          
+          <a href="/blogs/<%= blog._id %>">
+            <% if (blog.image) { %>
+              <img src="<%= blog.image.url %>" class="card-img-top" alt="<%= blog.title %>">
+            <% } else { %>
+              <div class="card-img-placeholder"></div>
+            <% } %>
+            <div class="card-body p-3">
+              <h6 class="card-title fw-bold"><%= blog.title %></h6>
+              <p class="card-text text-muted small mb-0"><%= blog.headContent %></p>
+            </div>
+          </a>
+
+          <!-- Like Button -->
+          <button class="btn btn-sm like-btn" data-id="<%= blog._id %>">
+            <span class="heart">
+              <% if (currUser && blog.likedBy && blog.likedBy.some(id => id && id.toString() === currUser._id.toString())) { %>
+                ❤️
+              <% } else { %>
+                🤍
+              <% } %>
+            </span>
+            <span class="like-count"><%= blog.likes %></span>
+          </button>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- CTA Section -->
+<section class="cta-section text-center py-5">
+  <div class="container">
+    <h2 class="fw-bold mb-3">Got a story to share?</h2>
+    <p class="mb-4">Join our community and share your experiences with the world.</p>
+    <a href="/blogs/new" class="btn btn-accent btn-lg">Write a Blog</a>
+  </div>
+</section>
+
+<style>
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, #002855, #001233);
+  min-height: 70vh;
+  padding: 60px 20px;
+}
+
+.text-accent { color: #0466c8; }
+
+/* Buttons */
+.btn-accent {
+  background-color: #0466c8;
+  border: none;
+  color: #fff;
+}
+.btn-accent:hover { background-color: #0353a4; }
+
+/* Section Titles */
+.section-title { font-weight: bold; color: #023e7d; }
+
+/* Blog Cards */
+.listing-card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.listing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+.card-img-top { object-fit: cover; height: 180px; }
+.card-img-placeholder { background: #5c677d; height: 180px; width: 100%; }
+
+/* Like Button */
+.like-btn {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 0.9rem;
+  border: 1px solid #0466c8;
+  color: #0466c8;
+  background: #fff;
+  border-radius: 20px;
+  padding: 4px 10px;
+}
+.like-btn:hover { background: #0466c8; color: #fff; }
+
+/* More Options (top-right) */
+.more-options {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+}
+
+/* Style the button inside */
+.more-options .dropdown-toggle {
+  background: #0353a4;        /* Nice blue */
+  color: #fff;
+  border: none;
+  border-radius: 12px;        /* Rounded rectangular */
+  padding: 4px 10px;
+  font-size: 1rem;
+  transition: background 0.2s ease, transform 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover + active effects */
+.more-options .dropdown-toggle:hover,
+.more-options .dropdown-toggle:focus {
+  background: #0466c8;        /* Lighter blue on hover */
+  transform: scale(1.05);
+}
+
+/* Remove default Bootstrap caret if you only want ⋮ */
+.more-options .dropdown-toggle::after {
+  display: none;
+}
+
+/* Dropdown menu styling */
+.more-options .dropdown-menu {
+  background-color: #001233;   /* Dark navy to match theme */
+  border-radius: 10px;
+  border: none;
+  padding: 6px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.more-options .dropdown-item {
+  color: #d0d0d0;
+  font-size: 0.9rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.more-options .dropdown-item:hover {
+  background-color: #0353a4;
+  color: #ffffff;
+}
+
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ----- SHARE BUTTON -----
+  document.querySelectorAll(".share-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const url = window.location.origin + btn.dataset.url;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Check out this blog!", url });
+        } catch (err) {
+          console.log("Share cancelled", err);
+        }
+      } else {
+        try {
+          await navigator.clipboard.writeText(url);
+          alert("📋 Blog link copied to clipboard!");
+        } catch (err) {
+          alert("❌ Failed to copy link.");
+        }
+      }
+    });
+  });
+
+  // ----- LIKE BUTTON -----
+  document.querySelectorAll(".like-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const blogId = btn.dataset.id;
+      const heart = btn.querySelector(".heart");
+      const likeCountSpan = btn.querySelector(".like-count");
+
+      try {
+        const res = await fetch(`/blogs/${blogId}/like`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          heart.textContent = data.liked ? "❤️" : "🤍";
+          likeCountSpan.textContent = data.likes;
+        } else {
+          alert("⚠️ You need to login to like a blog!");
+        }
+      } catch (err) {
+        console.error("Like error:", err);
+      }
+    });
+  });
+
+  // ----- SAVE / UNSAVE BUTTON -----
+  document.querySelectorAll(".save-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const blogId = btn.dataset.id;
+
+      try {
+        const res = await fetch(`/blogs/${blogId}/save`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const data = await res.json();
+
+        if (data.saved) {
+          btn.textContent = "✅ Saved";
+          btn.dataset.saved = "true";
+        } else {
+          btn.textContent = "💾 Save";
+          btn.dataset.saved = "false";
+        }
+      } catch (err) {
+        console.error("Save toggle error:", err);
+        alert("❌ Failed to update save status.");
+      }
+    });
+  });
+});
+</script>
