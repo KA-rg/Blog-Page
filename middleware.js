@@ -19,15 +19,28 @@ module.exports.saveRedirectUrl = (req, res, next) => {
   next();
 };
 
-module.exports.isOwner = async(req, res, next) => {
-  let { id } = req.params;
-  let blog = await Blog.findById(id);
-  if(!blog.owner.equals(res.locals.currUser._id)) {
-    req.flash("error", "You are not the owner of this listing");
+module.exports.isOwner = async (req, res, next) => {
+  const { id } = req.params;
+  const blog = await Blog.findById(id);
+
+  // Put your admin's MongoDB ObjectId here as a string
+  const ADMIN_ID = "68c6b7161d3ba08c23a762ba";
+
+  // If no blog found, fail gracefully
+  if (!blog) {
+    req.flash("error", "Blog not found!");
+    return res.redirect("/blogs");
+  }
+
+  // Allow if current user is owner OR is admin
+  if (!blog.owner.equals(res.locals.currUser._id) && res.locals.currUser._id.toString() !== ADMIN_ID) {
+    req.flash("error", "You are not authorized to do that!");
     return res.redirect(`/blogs/${id}`);
   }
+
   next();
 };
+
 
 module.exports.isReviewAuthor = async(req, res, next) => {
   let { id, reviewId } = req.params;
