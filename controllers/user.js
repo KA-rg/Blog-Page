@@ -15,7 +15,7 @@ module.exports.signup = async (req, res, next) => {
     req.login(registeredUser, err => {
       if (err) return next(err);
       req.flash("success", "Welcome to FailStory!");
-      res.redirect("/blogs");
+      res.redirect("/");
     });
   } catch (e) {
     req.flash("error", e.message);
@@ -31,7 +31,7 @@ module.exports.renderLoginForm = (req,res) => {
 // Login logic
 module.exports.login = (req,res) => {
   req.flash("success", "Welcome back!");
-  const redirectUrl = res.locals.redirect || "/blogs";
+  const redirectUrl = res.locals.redirect || "/";
   res.redirect(redirectUrl);
 };
 
@@ -40,7 +40,7 @@ module.exports.logout = (req, res, next) => {
   req.logout(err => {
     if (err) return next(err);
     req.flash("success", "Logged you out!");
-    res.redirect("/blogs");
+    res.redirect("/");
   });
 };
 

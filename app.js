@@ -25,6 +25,8 @@ const blogRouter = require("./routes/blog.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
+const blogController = require("./controllers/blog.js");
+
 // const dbUrl = process.env.ATLASDB_URL;
 const dbUrl = "mongodb://localhost:27017/failStory";
 main()
@@ -110,6 +112,8 @@ port = 8080;
 app.listen(port, () => { 
   console.log(`app is listening to port:${port}`);
 });
+
+app.get("/", blogController.home);
 
 // 7. Catch-all for undefined routes
 app.all(/.*/, (req, res, next) => {

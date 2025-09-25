@@ -1,6 +1,6 @@
 const Blog = require("../models/blog");
 
-module.exports.index = async (req, res, next) => {
+module.exports.home = async (req, res, next) => {
   let { search } = req.query;
 
   let allBlog;
@@ -22,6 +22,25 @@ module.exports.index = async (req, res, next) => {
     const allTags = [...new Set(blogs.flatMap(blog => blog.tags))];
 
   res.render("blogs/index", { allBlog, blogs, search, trending, mostReads, popular, allTags });
+};
+
+module.exports.index = async (req, res, next) => {
+  let { search } = req.query;
+
+  let allBlog;
+  if (search) {
+    // case-insensitive search on title or location (example)
+    allBlog = await Blog.find({
+      $or: [
+        { title: new RegExp(search, "i") },
+        { headContent: new RegExp(search, "i") }
+      ]
+    });
+  } else {
+    allBlog = await Blog.find({});
+  }
+  const blogs = await Blog.find({});
+  res.render("blogs/allBlogs", { allBlog, blogs, search });
 };
 
 module.exports.saveBlog = async (req, res) => {
