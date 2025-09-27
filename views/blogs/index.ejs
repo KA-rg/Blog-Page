@@ -341,22 +341,37 @@ document.addEventListener("DOMContentLoaded", () => {
       const heart = btn.querySelector(".heart");
       const likeCountSpan = btn.querySelector(".like-count");
 
-      try {
-        const res = await fetch(`/blogs/${blogId}/like`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" }
-        });
+     try {
+  const res = await fetch(`/blogs/${blogId}/like`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" }
+  });
 
-        const data = await res.json();
-        if (data.success) {
-          heart.textContent = data.liked ? "❤️" : "🤍";
-          likeCountSpan.textContent = data.likes;
-        } else {
-          alert("⚠️ You need to login to like a blog!");
-        }
-      } catch (err) {
-        console.error("Like error:", err);
-      }
+  const data = await res.json();
+
+  if (data.success) {
+    // Update the heart icon and like count
+    heart.textContent = data.liked ? "❤️" : "🤍";
+    likeCountSpan.textContent = data.likes;
+
+    // Refresh the page after a short delay (optional)
+    setTimeout(() => {
+      window.location.reload();
+    }, 200); // 200ms delay to show the updated icon first
+
+  } else {
+    // Show alert and redirect to login
+    alert("⚠️ You need to login to like a blog!");
+    window.location.href = "/login"; // redirect to login page
+  }
+
+} catch (err) {
+  // Refresh the page after a short delay (optional)
+    setTimeout(() => {
+      window.location.reload();
+    }, 0); // 200ms delay to show the updated icon first
+}
+
     });
   });
 
@@ -376,9 +391,11 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.saved) {
           btn.textContent = "✅ Saved";
           btn.dataset.saved = "true";
+          alert("Post saved");
         } else {
           btn.textContent = "💾 Save";
           btn.dataset.saved = "false";
+          alert("Post unsaved");
         }
       } catch (err) {
         console.error("Save toggle error:", err);
