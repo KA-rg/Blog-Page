@@ -207,7 +207,7 @@ module.exports.showBlog = async (req, res, next) => {
   }
 };
 
-module.exports.updateBlog = async (req,res,next) =>{
+module.exports.updateBlog = async (req,res,next) => {
   let { id } = req.params;
   let blog = await Blog.findByIdAndUpdate(id, {...req.body.blog});
 
