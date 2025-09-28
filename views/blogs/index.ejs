@@ -36,10 +36,8 @@
                 </button>
               </li>
               <li>
-                  <a class="dropdown-item" href="/blogs/<%= blog._id %>">
-                    🔎 View Blog
-                  </a>
-                </li>
+                <a class="dropdown-item" href="/blogs/<%= blog._id %>">🔎 View Blog</a>
+              </li>
             </ul>
           </div>
 
@@ -100,10 +98,8 @@
                 </button>
               </li>
               <li>
-                  <a class="dropdown-item" href="/blogs/<%= blog._id %>">
-                    🔎 View Blog
-                  </a>
-                </li>
+                <a class="dropdown-item" href="/blogs/<%= blog._id %>">🔎 View Blog</a>
+              </li>
             </ul>
           </div>
 
@@ -150,26 +146,24 @@
             <ul class="dropdown-menu">
               <li><button class="dropdown-item share-btn" data-url="/blogs/<%= blog._id %>">📤 Share</button></li>
               <li>
-  <button 
-    class="dropdown-item save-btn" 
-    data-id="<%= blog._id %>" 
-    data-saved="<%= currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString()) ? 'true' : 'false' %>">
-    <% if (currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString())) { %>
-      ✅ Saved
-    <% } else { %>
-      💾 Save
-    <% } %>
-  </button>
-</li>
-<li>
-                  <a class="dropdown-item" href="/blogs/<%= blog._id %>">
-                    🔎 View Blog
-                  </a>
-                </li>
-                
+                <button 
+                  class="dropdown-item save-btn" 
+                  data-id="<%= blog._id %>"
+                  data-saved="<%= currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString()) ? 'true' : 'false' %>"
+                >
+                  <% if (currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString())) { %>
+                    ✅ Saved
+                  <% } else { %>
+                    💾 Save
+                  <% } %>
+                </button>
+              </li>
+              <li>
+                <a class="dropdown-item" href="/blogs/<%= blog._id %>">🔎 View Blog</a>
+              </li>
             </ul>
           </div>
-          
+
           <a href="/blogs/<%= blog._id %>">
             <% if (blog.image) { %>
               <img src="<%= blog.image.url %>" class="card-img-top" alt="<%= blog.title %>">
@@ -207,6 +201,9 @@
     <a href="/blogs/new" class="btn btn-accent btn-lg">Write a Blog</a>
   </div>
 </section>
+
+<!-- Toast container -->
+<div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
 
 <style>
 /* Hero Section */
@@ -258,150 +255,96 @@
 }
 .like-btn:hover { background: #0466c8; color: #fff; }
 
-/* More Options (top-right) */
-.more-options {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 1000;
-}
-
-/* Style the button inside */
+/* More Options */
+.more-options { position: absolute; top: 12px; right: 12px; z-index: 1000; }
 .more-options .dropdown-toggle {
-  background: #0353a4;        /* Nice blue */
+  background: #0353a4;
   color: #fff;
   border: none;
-  border-radius: 12px;        /* Rounded rectangular */
+  border-radius: 12px;
   padding: 4px 10px;
   font-size: 1rem;
   transition: background 0.2s ease, transform 0.15s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
-
-/* Hover + active effects */
 .more-options .dropdown-toggle:hover,
-.more-options .dropdown-toggle:focus {
-  background: #0466c8;        /* Lighter blue on hover */
-  transform: scale(1.05);
-}
-
-/* Remove default Bootstrap caret if you only want ⋮ */
-.more-options .dropdown-toggle::after {
-  display: none;
-}
-
-/* Dropdown menu styling */
+.more-options .dropdown-toggle:focus { background: #0466c8; transform: scale(1.05); }
+.more-options .dropdown-toggle::after { display: none; }
 .more-options .dropdown-menu {
-  background-color: #001233;   /* Dark navy to match theme */
+  background-color: #001233;
   border-radius: 10px;
   border: none;
   padding: 6px 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
-
 .more-options .dropdown-item {
   color: #d0d0d0;
   font-size: 0.9rem;
   transition: background 0.2s ease, color 0.2s ease;
 }
-
 .more-options .dropdown-item:hover {
   background-color: #0353a4;
   color: #ffffff;
 }
-
 </style>
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  // ----- SHARE BUTTON -----
-  document.querySelectorAll(".share-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const url = window.location.origin + btn.dataset.url;
-      if (navigator.share) {
-        try {
-          await navigator.share({ title: "Check out this blog!", url });
-        } catch (err) {
-          console.log("Share cancelled", err);
-        }
-      } else {
-        try {
-          await navigator.clipboard.writeText(url);
-          alert("📋 Blog link copied to clipboard!");
-        } catch (err) {
-          alert("❌ Failed to copy link.");
-        }
-      }
-    });
-  });
-
-  // ----- LIKE BUTTON -----
-  document.querySelectorAll(".like-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const blogId = btn.dataset.id;
-      const heart = btn.querySelector(".heart");
-      const likeCountSpan = btn.querySelector(".like-count");
-
-     try {
-  const res = await fetch(`/blogs/${blogId}/like`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" }
-  });
-
-  const data = await res.json();
-
-  if (data.success) {
-    // Update the heart icon and like count
-    heart.textContent = data.liked ? "❤️" : "🤍";
-    likeCountSpan.textContent = data.likes;
-
-    // Refresh the page after a short delay (optional)
-    setTimeout(() => {
-      window.location.reload();
-    }, 200); // 200ms delay to show the updated icon first
-
-  } else {
-    // Show alert and redirect to login
-    alert("⚠️ You need to login to like a blog!");
-    window.location.href = "/login"; // redirect to login page
-  }
-
-} catch (err) {
-  // Refresh the page after a short delay (optional)
-    setTimeout(() => {
-      window.location.reload();
-    }, 0); // 200ms delay to show the updated icon first
+function showToast(message, type = "success") {
+  const toastId = "toast-" + Date.now();
+  const toast = `
+    <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0 show mb-2" role="alert">
+      <div class="d-flex">
+        <div class="toast-body">${message}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="this.closest('.toast').remove()"></button>
+      </div>
+    </div>`;
+  document.getElementById("toast-container").insertAdjacentHTML("beforeend", toast);
+  setTimeout(() => { document.getElementById(toastId)?.remove(); }, 3000);
 }
 
-    });
+// ----- SHARE BUTTON -----
+document.querySelectorAll(".share-btn").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const url = window.location.origin + btn.dataset.url;
+    if (navigator.share) {
+      try { await navigator.share({ title: "Check out this blog!", url }); }
+      catch (err) { console.log("Share cancelled", err); }
+    } else {
+      try { await navigator.clipboard.writeText(url); showToast("📋 Blog link copied!"); }
+      catch { showToast("❌ Failed to copy link.", "danger"); }
+    }
   });
+});
 
-  // ----- SAVE / UNSAVE BUTTON -----
-  document.querySelectorAll(".save-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const blogId = btn.dataset.id;
-
-      try {
-        const res = await fetch(`/blogs/${blogId}/save`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" }
-        });
-
-        const data = await res.json();
-
-        if (data.saved) {
-          btn.textContent = "✅ Saved";
-          btn.dataset.saved = "true";
-          alert("Post saved");
-        } else {
-          btn.textContent = "💾 Save";
-          btn.dataset.saved = "false";
-          alert("Post unsaved");
-        }
-      } catch (err) {
-        console.error("Save toggle error:", err);
-        alert("❌ Failed to update save status.");
+// ----- LIKE BUTTON -----
+document.querySelectorAll(".like-btn").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const blogId = btn.dataset.id;
+    const heart = btn.querySelector(".heart");
+    const likeCountSpan = btn.querySelector(".like-count");
+    try {
+      const res = await fetch(`/blogs/${blogId}/like`, { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        heart.textContent = data.liked ? "❤️" : "🤍";
+        likeCountSpan.textContent = data.likes;
+        showToast(data.liked ? "💖 Liked!" : "💔 Unliked!", "success");
+      } else {
+        showToast(data.message || "Failed to like blog", "danger");
       }
-    });
+    } catch { showToast("Error connecting to server", "danger"); }
+  });
+});
+
+// ----- SAVE BUTTON -----
+document.querySelectorAll(".save-btn").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const blogId = btn.dataset.id;
+    try {
+      const res = await fetch(`/blogs/${blogId}/save`, { method: "POST" });
+      const data = await res.json();
+      if (data.saved) { btn.textContent = "✅ Saved"; showToast("Post saved!"); }
+      else { btn.textContent = "💾 Save"; showToast("Post unsaved!", "warning"); }
+    } catch { showToast("Failed to update save status", "danger"); }
   });
 });
 </script>
