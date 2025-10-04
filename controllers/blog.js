@@ -199,9 +199,8 @@ module.exports.showBlog = async (req, res, next) => {
   // Previous and next blogs
   const prevBlog = index > 0 ? blogs[index - 1] : null;
   const nextBlog = index < blogs.length - 1 ? blogs[index + 1] : null;
-  const ADMIN_ID = "68c6b7161d3ba08c23a762ba";
 
-    res.render("blogs/show", { blog, blogs, prevBlog, nextBlog, currUser: req.user, ADMIN_ID });
+    res.render("blogs/show", { blog, blogs, prevBlog, nextBlog, currUser: req.user, ADMIN_ID: process.env.ADMIN_ID});
   } catch (err) {
     next(err);
   }
