@@ -1,5 +1,6 @@
 const Blog = require("../models/blog.js");
 const Review = require("../models/review.js");
+const Notification = require("../models/notification");
 
 module.exports.createReview = async(req,res) => {
   let blog = await Blog.findById(req.params.id);
@@ -10,6 +11,12 @@ module.exports.createReview = async(req,res) => {
   await newReview.save();
   await blog.save();
   req.flash("success", "New Review Created!");
+  await Notification.create({
+  type: "REVIEW_ADDED",
+  message: `${req.user.username} added a review on blog: ${blog.title}`,
+  blog: blog._id,
+  review: newReview._id
+});
 
   res.redirect(`/blogs/${req.params.id}`);
 };

@@ -24,8 +24,10 @@ const User = require("./models/user.js");
 const blogRouter = require("./routes/blog.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+const notificationRouter = require("./routes/notification.js");
 
 const blogController = require("./controllers/blog.js");
+const { setNotificationCount } = require("./middleware");
 
 // const dbUrl = process.env.ATLASDB_URL;
 const dbUrl = "mongodb://localhost:27017/failStory";
@@ -88,7 +90,7 @@ app.use((req, res, next) => {
   
   next();
 });
-
+app.use(setNotificationCount);
 
 // 5. Dummy user middleware (ONLY FOR TESTING - remove later)
 // app.use((req, res, next) => {
@@ -107,6 +109,7 @@ app.use((req, res, next) => {
 app.use("/blogs", blogRouter);
 app.use("/blogs/:id/reviews", reviewRouter);
 app.use("/", userRouter);
+app.use("/admin/notifications", notificationRouter);
 
 port = 8080; 
 app.listen(port, () => { 

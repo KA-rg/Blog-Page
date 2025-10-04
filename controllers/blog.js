@@ -1,5 +1,6 @@
 const { isOwner } = require("../middleware");
 const Blog = require("../models/blog");
+const Notification = require("../models/notification");
 
 module.exports.home = async (req, res, next) => {
   let { search } = req.query;
@@ -216,6 +217,12 @@ module.exports.updateBlog = async (req,res,next) => {
     blog.image = { url, filename };
     await blog.save();
   }
+  // ✅ Create admin notification
+    await Notification.create({
+      type: "BLOG_EDITED",
+      message: `${req.user.username} updated the blog: ${blog.title}`,
+      blog: blog._id
+    });
   req.flash("success", "Blog Updated!");
   res.redirect(`/blogs/${id}`);
 };
@@ -246,6 +253,12 @@ module.exports.createBlog = async (req,res,next) => {
   newBlog.owner = req.user._id;
   newBlog.image = { url, filename };
   await newBlog.save();
+  // ✅ Create admin notification
+    await Notification.create({
+      type: "BLOG_CREATED",
+      message: `${req.user.username} created a new blog: ${newBlog.title}`,
+      blog: newBlog._id
+    });
   req.flash("success", "New Blog Created!");
   res.redirect("/blogs");
 };
@@ -254,5 +267,11 @@ module.exports.destroyBlog = async (req,res,next) => {
   let { id } = req.params;
   let deletedBlog = await Blog.findByIdAndDelete(id);
   req.flash("success", "Blog deleted Successfully!");
+      // ✅ Create admin notification
+      await Notification.create({
+        type: "BLOG_DELETED",
+        message: `Blog titled "${deletedBlog.title}" was deleted`,
+        blog: deletedBlog._id
+      });
   res.redirect("/blogs");
 };

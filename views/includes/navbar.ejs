@@ -47,6 +47,18 @@
             <ul class="dropdown-menu dropdown-menu-custom" aria-labelledby="userDropdown">
               <li><a class="dropdown-item" href="/profile">Profile</a></li>
               <li><a class="dropdown-item" href="blogs/saved">Saved</a></li>
+              <li>
+                <% if (currUser && currUser._id.toString() === process.env.ADMIN_ID) { %>
+                  <a class="dropdown-item" href="/admin/notifications">Notifications
+                    <i class="fa-solid fa-bell"></i>
+                    <% if (notificationCount > 0) { %>
+                      <span class="badge rounded-pill bg-danger">
+                        <%= notificationCount %>
+                      </span>
+                    <% } %>
+                  </a>
+                <% } %>
+              </li>
               <li><a class="dropdown-item" href="/logout">Logout</a></li>
             </ul>
           </li>
