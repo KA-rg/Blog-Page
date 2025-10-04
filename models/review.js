@@ -26,7 +26,7 @@ const reviewSchema = new Schema({
   blog: {
     type: Schema.Types.ObjectId,
     ref: "Blog", // link the review to a blog post
-    required: true,
+    // required: true,
   },
 });
 

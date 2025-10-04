@@ -7,6 +7,7 @@ module.exports.blogSchema = Joi.object({
     content: Joi.string().required(),
     country: Joi.string().required(),
     author: Joi.string().required(),
+    image: Joi.string().allow("", null),
     tags: Joi.array().items(Joi.string())
   }).required()
 });
