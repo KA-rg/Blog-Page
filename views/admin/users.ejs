@@ -1,0 +1,19 @@
+<% layout('layouts/boilerplate') %>
+<h2>User Management</h2>
+<table class="table table-bordered">
+  <tr><th>Username</th><th>Email</th><th>Actions</th></tr>
+  <% users.forEach(u => { %>
+    <tr>
+      <td><%= u.username %></td>
+      <td><%= u.email %></td>
+      <td>
+        <form action="/admin/users/<%= u._id %>/reset-password" method="POST" style="display:inline;">
+          <button class="btn btn-sm btn-warning">Reset Password</button>
+        </form>
+        <form action="/admin/users/<%= u._id %>/disable" method="POST" style="display:inline;">
+          <button class="btn btn-sm btn-danger">Disable</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>

@@ -1,0 +1,22 @@
+<% layout('layouts/boilerplate') %>
+<h2>Blog Moderation</h2>
+<table class="table table-bordered">
+  <tr><th>Title</th><th>Owner</th><th>Status</th><th>Actions</th></tr>
+  <% blogs.forEach(b => { %>
+    <tr>
+      <td><%= b.title %></td>
+      <td><%= b.owner.username %></td>
+      <td><%= b.approved ? "Approved" : "Pending" %></td>
+      <td>
+        <% if (!b.approved) { %>
+          <form action="/admin/blogs/<%= b._id %>/approve" method="POST" style="display:inline;">
+            <button class="btn btn-sm btn-success">Approve</button>
+          </form>
+        <% } %>
+        <form action="/admin/blogs/<%= b._id %>/delete" method="POST" style="display:inline;">
+          <button class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>

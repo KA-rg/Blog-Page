@@ -25,6 +25,7 @@ const blogRouter = require("./routes/blog.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 const notificationRouter = require("./routes/notification.js");
+const adminRoutes = require("./routes/admin");
 
 const blogController = require("./controllers/blog.js");
 const { setNotificationCount } = require("./middleware");
@@ -82,12 +83,15 @@ app.use((req, res, next) => {
 
 // 4. Flash + current user locals
 app.use((req, res, next) => {
+  res.locals.messages = {
+    success: req.flash("success"),
+    error: req.flash("error")
+  };
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   res.locals.usernameError = req.flash("usernameError");
   res.locals.emailError = req.flash("emailError");
   res.locals.passwordError = req.flash("passwordError");
-  
   next();
 });
 app.use(setNotificationCount);
@@ -110,6 +114,7 @@ app.use("/blogs", blogRouter);
 app.use("/blogs/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 app.use("/notifications", notificationRouter);
+app.use("/admin", adminRoutes);
 
 port = 8080; 
 app.listen(port, () => { 

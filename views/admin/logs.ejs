@@ -1,0 +1,13 @@
+<% layout('layouts/boilerplate') %>
+<h2>Activity Logs</h2>
+<table class="table table-bordered">
+  <tr><th>User</th><th>Action</th><th>Target</th><th>Time</th></tr>
+  <% logs.forEach(log => { %>
+    <tr>
+      <td><%= log.user %></td>
+      <td><%= log.action %></td>
+      <td><%= log.target || "-" %></td>
+      <td><%= log.createdAt.toLocaleString() %></td>
+    </tr>
+  <% }) %>
+</table>

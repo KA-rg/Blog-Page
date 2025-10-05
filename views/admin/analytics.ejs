@@ -1,0 +1,185 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container my-5">
+  <h2 class="mb-4">📊 Admin Analytics</h2>
+
+  <!-- Summary Cards -->
+  <div class="row mb-4">
+    <div class="col-md-2 mb-2">
+      <div class="card text-center shadow-sm p-3">
+        <h5>Total Blogs</h5>
+        <h3><%= totalBlogs %></h3>
+      </div>
+    </div>
+    <div class="col-md-2 mb-2">
+      <div class="card text-center shadow-sm p-3">
+        <h5>Total Users</h5>
+        <h3><%= totalUsers %></h3>
+      </div>
+    </div>
+    <div class="col-md-2 mb-2">
+      <div class="card text-center shadow-sm p-3">
+        <h5>Total Comments</h5>
+        <h3><%= totalComments %></h3>
+      </div>
+    </div>
+    <div class="col-md-2 mb-2">
+      <div class="card text-center shadow-sm p-3">
+        <h5>Total Likes</h5>
+        <h3><%= totalLikes %></h3>
+      </div>
+    </div>
+    <div class="col-md-2 mb-2">
+      <div class="card text-center shadow-sm p-3">
+        <h5>Total Saves</h5>
+        <h3><%= totalSaves %></h3>
+      </div>
+    </div>
+    <div class="col-md-2 mb-2">
+      <div class="card text-center shadow-sm p-3">
+        <h5>Unread Notifications</h5>
+        <h3><%= unreadNotifications %></h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <% if (alerts.length > 0) { %>
+    <div class="alert alert-warning">
+      <h5>⚠️ Alerts</h5>
+      <ul>
+        <% alerts.forEach(a => { %>
+          <li><%= a %></li>
+        <% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <!-- Filter -->
+  <form class="mb-4 d-flex" method="get" action="/admin/analytics">
+    <label class="me-2">Date Range:</label>
+    <select name="range" class="form-select w-auto me-2">
+      <option value="all" <%= range === 'all' ? 'selected' : '' %>>All</option>
+      <option value="7" <%= range === '7' ? 'selected' : '' %>>Last 7 days</option>
+      <option value="30" <%= range === '30' ? 'selected' : '' %>>Last 30 days</option>
+    </select>
+    <button class="btn btn-primary">Apply</button>
+  </form>
+
+  <!-- Export -->
+  <div class="mb-4">
+    <a href="/admin/analytics/export?range=<%= range %>" class="btn btn-success">
+      📥 Export Analytics (Excel)
+    </a>
+  </div>
+
+  <div class="row">
+    <!-- Chart 1: Blogs, Views & Likes -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Blogs, Views & Likes (per day)</h5>
+        <canvas id="blogStatsChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 2: Comments per day -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Comments Per Day</h5>
+        <canvas id="commentChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 3: Category Distribution -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Category Distribution</h5>
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 4: Top Tags -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Top Tags</h5>
+        <canvas id="topTagsChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Top Blogs -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Top Blogs</h5>
+        <ul class="list-group">
+          <% topBlogs.forEach(b => { %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <%= b.title %>
+              <span class="badge bg-primary">👁 <%= b.views %> | ❤️ <%= b.likes %> | 💬 <%= b.commentsCount %></span>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Top Authors -->
+    <div class="col-lg-6 mb-4">
+      <div class="card shadow-sm p-3">
+        <h5 class="mb-3">Top Authors</h5>
+        <ul class="list-group">
+          <% topAuthors.forEach(a => { %>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <%= a.username %>
+              <span class="badge bg-success">📝 <%= a.blogsCount %> | 👁 <%= a.totalViews %> | ❤️ <%= a.totalLikes %></span>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Blog Stats Chart
+  new Chart(document.getElementById("blogStatsChart"), {
+    type: "line",
+    data: {
+      labels: <%- JSON.stringify(blogStats.map(b => b._id)) %>,
+      datasets: [
+        { label: "Blogs", data: <%- JSON.stringify(blogStats.map(b => b.totalBlogs)) %>, borderColor: "blue", fill: false },
+        { label: "Views", data: <%- JSON.stringify(blogStats.map(b => b.totalViews)) %>, borderColor: "green", fill: false },
+        { label: "Likes", data: <%- JSON.stringify(blogStats.map(b => b.totalLikes)) %>, borderColor: "red", fill: false }
+      ]
+    }
+  });
+
+  // Comments Chart
+  new Chart(document.getElementById("commentChart"), {
+    type: "bar",
+    data: {
+      labels: <%- JSON.stringify(commentStats.map(c => c._id)) %>,
+      datasets: [{ label: "Comments", data: <%- JSON.stringify(commentStats.map(c => c.totalComments)) %>, backgroundColor: "orange" }]
+    }
+  });
+
+  // Category Pie Chart
+  new Chart(document.getElementById("categoryChart"), {
+    type: "pie",
+    data: {
+      labels: <%- JSON.stringify(categoryDist.map(c => c._id)) %>,
+      datasets: [{ data: <%- JSON.stringify(categoryDist.map(c => c.count)) %>,
+        backgroundColor: ["#42A5F5","#66BB6A","#FFA726","#AB47BC","#EF5350"]
+      }]
+    }
+  });
+
+  // Top Tags Chart
+  new Chart(document.getElementById("topTagsChart"), {
+    type: "bar",
+    data: {
+      labels: <%- JSON.stringify(topTags.map(t => t.tag)) %>,
+      datasets: [{ label: "Tag Count", data: <%- JSON.stringify(topTags.map(t => t.count)) %>, backgroundColor: "#FF7043" }]
+    }
+  });
+</script>

@@ -1,0 +1,83 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container my-5">
+  <h2 class="mb-4">🛠 Admin Dashboard</h2>
+  
+  <!-- Flash Messages -->
+  <% if (messages?.error?.length) { %>
+    <div class="alert alert-danger"><%= messages.error[0] %></div>
+  <% } %>
+  <% if (messages?.success?.length) { %>
+    <div class="alert alert-success"><%= messages.success[0] %></div>
+  <% } %>
+
+  <div class="row g-4">
+    <!-- Analytics -->
+    <div class="col-md-4">
+      <a href="/admin/analytics" class="text-decoration-none">
+        <div class="card shadow-sm p-3 h-100 text-center hover-shadow">
+          <h4>📊 Analytics</h4>
+          <p>View site metrics: views, likes, comments, top blogs/authors.</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- User Management -->
+    <div class="col-md-4">
+      <a href="/admin/users" class="text-decoration-none">
+        <div class="card shadow-sm p-3 h-100 text-center hover-shadow">
+          <h4>👥 User Management</h4>
+          <p>View users, disable accounts, force password resets, set temporary passwords.</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Blog Moderation -->
+    <div class="col-md-4">
+      <a href="/admin/blogs" class="text-decoration-none">
+        <div class="card shadow-sm p-3 h-100 text-center hover-shadow">
+          <h4>📝 Blog Moderation</h4>
+          <p>Edit, approve, or delete blogs posted by users.</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Notifications -->
+    <div class="col-md-4">
+      <a href="/notifications" class="text-decoration-none">
+        <div class="card shadow-sm p-3 h-100 text-center hover-shadow">
+          <h4>🔔 Notifications</h4>
+          <p>View all notifications and mark them as read or delete them.</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Reports / Logs -->
+    <div class="col-md-4">
+      <a href="/admin/logs" class="text-decoration-none">
+        <div class="card shadow-sm p-3 h-100 text-center hover-shadow">
+          <h4>📄 Activity Logs</h4>
+          <p>View all admin/user activities for auditing and security monitoring.</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Settings -->
+    <div class="col-md-4">
+      <a href="/admin/settings" class="text-decoration-none">
+        <div class="card shadow-sm p-3 h-100 text-center hover-shadow">
+          <h4>⚙ Settings</h4>
+          <p>Configure site options, roles, permissions, categories, and other settings.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .hover-shadow:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+  }
+</style>
