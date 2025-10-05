@@ -18,4 +18,6 @@ router.post("/:id/delete", isAdmin, notificationController.deleteNotification);
 // ✅ Delete all notifications
 router.post("/delete-all", isAdmin, notificationController.deleteAllNotifications);
 
+router.get("/:id/redirect", isAdmin, notificationController.redirectPage);
+
 module.exports = router;

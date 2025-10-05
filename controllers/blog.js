@@ -221,7 +221,8 @@ module.exports.updateBlog = async (req,res,next) => {
     await Notification.create({
       type: "BLOG_EDITED",
       message: `${req.user.username} updated the blog: ${blog.title}`,
-      blog: blog._id
+      blog: blog._id,
+      link: `/blogs/${blog._id}`
     });
   req.flash("success", "Blog Updated!");
   res.redirect(`/blogs/${id}`);
@@ -257,7 +258,8 @@ module.exports.createBlog = async (req,res,next) => {
     await Notification.create({
       type: "BLOG_CREATED",
       message: `${req.user.username} created a new blog: ${newBlog.title}`,
-      blog: newBlog._id
+      blog: newBlog._id,
+      link: `/blogs/${newBlog._id}`
     });
   req.flash("success", "New Blog Created!");
   res.redirect("/blogs");
@@ -271,7 +273,9 @@ module.exports.destroyBlog = async (req,res,next) => {
       await Notification.create({
         type: "BLOG_DELETED",
         message: `Blog titled "${deletedBlog.title}" was deleted`,
-        blog: deletedBlog._id
+        blog: deletedBlog._id,
+        link: `/notifications`
       });
+      req.flash("success", "blog has been deleted");
   res.redirect("/blogs");
 };

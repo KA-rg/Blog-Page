@@ -49,7 +49,7 @@
               <li><a class="dropdown-item" href="blogs/saved">Saved</a></li>
               <li>
                 <% if (currUser && currUser._id.toString() === process.env.ADMIN_ID) { %>
-                  <a class="dropdown-item" href="/admin/notifications">Notifications
+                  <a class="dropdown-item" href="/notifications">Notifications
                     <i class="fa-solid fa-bell"></i>
                     <% if (notificationCount > 0) { %>
                       <span class="badge rounded-pill bg-danger">

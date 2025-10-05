@@ -109,7 +109,7 @@ app.use(setNotificationCount);
 app.use("/blogs", blogRouter);
 app.use("/blogs/:id/reviews", reviewRouter);
 app.use("/", userRouter);
-app.use("/admin/notifications", notificationRouter);
+app.use("/notifications", notificationRouter);
 
 port = 8080; 
 app.listen(port, () => { 
