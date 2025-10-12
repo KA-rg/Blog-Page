@@ -68,11 +68,16 @@
   <!-- Like Button -->
   <button class="btn btn-sm like-btn-foot" data-id="<%= blog._id %>">
     <span class="heart">
-      <% if (currUser && blog.likedBy && blog.likedBy.some(id => id && id.toString() === currUser._id.toString())) { %>
-        ❤️
-      <% } else { %>
-        🤍
-      <% } %>
+      <% if (
+  currUser &&
+  blog.likedBy &&
+  blog.likedBy.some(user => user && user._id && user._id.toString() === currUser._id.toString())
+) { %>
+  ❤️
+<% } else { %>
+  🤍
+<% } %>
+
     </span>
     <span class="like-count"><%= blog.likes %></span>
   </button>

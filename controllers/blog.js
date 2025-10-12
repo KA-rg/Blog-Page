@@ -104,28 +104,47 @@ res.render("blogs/new", { tagEnum, blog: { tags: [] } });
 };
 
 module.exports.likeBlog = async (req, res) => {
+  try {
+    console.log("Like route hit:", req.params.id);
+    console.log("User:", req.user);
 
-    try {
     const blog = await Blog.findById(req.params.id);
+    if (!blog) {
+      console.log("❌ Blog not found");
+      return res.status(404).json({ success: false, message: "Blog not found" });
+    }
 
-    // Check if user already liked (for demo: store in req.session or user.likes)
-    const userId = req.user?._id; // if logged in
-    const alreadyLiked = blog.likedBy.includes(userId);
+    if (!req.user) {
+      console.log("❌ User not logged in");
+      return res.status(401).json({ success: false, message: "Login required" });
+    }
+
+    const userId = req.user._id;
+    const alreadyLiked = blog.likedBy.some(id => id.toString() === userId.toString());
+
+    console.log("Already liked:", alreadyLiked);
 
     if (alreadyLiked) {
-      // Unlike
-      blog.likes -= 1;
+      blog.likes = Math.max(0, blog.likes - 1);
       blog.likedBy = blog.likedBy.filter(id => id.toString() !== userId.toString());
     } else {
-      // Like
       blog.likes += 1;
       blog.likedBy.push(userId);
     }
 
     await blog.save();
-    res.redirect("/blogs");
+
+    console.log("✅ Blog updated. Likes:", blog.likes);
+
+    res.json({
+      success: true,
+      liked: !alreadyLiked,
+      likes: blog.likes
+    });
+
   } catch (err) {
-    res.status(500).json({ error: "Something went wrong" });
+    console.error("💥 Error in likeBlog:", err);
+    res.status(500).json({ success: false, message: "Server error", error: err.message });
   }
 };
 
@@ -200,7 +219,7 @@ module.exports.showBlog = async (req, res, next) => {
   // Previous and next blogs
   const prevBlog = index > 0 ? blogs[index - 1] : null;
   const nextBlog = index < blogs.length - 1 ? blogs[index + 1] : null;
-
+  
     res.render("blogs/show", { blog, blogs, prevBlog, nextBlog, currUser: req.user, ADMIN_ID: process.env.ADMIN_ID});
   } catch (err) {
     next(err);
