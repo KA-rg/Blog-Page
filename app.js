@@ -29,6 +29,8 @@ const adminRoutes = require("./routes/admin");
 
 const blogController = require("./controllers/blog.js");
 const { setNotificationCount } = require("./middleware");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+
 
 // const dbUrl = process.env.ATLASDB_URL;
 const dbUrl = "mongodb://localhost:27017/failStory";
@@ -80,6 +82,45 @@ app.use((req, res, next) => {
   next();
 });
 
+// Google OAuth strategy
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "/auth/google/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await User.findOne({ googleId: profile.id });
+
+        if (!user) {
+          const email = profile.emails[0].value;
+          user = await User.findOne({ email });
+
+          if (user) {
+            // link google account
+            user.googleId = profile.id;
+            user.isVerified = true;
+          } else {
+            // new google user
+            user = new User({
+              googleId: profile.id,
+              username: profile.displayName,
+              email,
+              isVerified: true,
+            });
+          }
+          await user.save();
+        }
+
+        return done(null, user);
+      } catch (err) {
+        return done(err, null);
+      }
+    }
+  )
+);
 
 // 4. Flash + current user locals
 app.use((req, res, next) => {

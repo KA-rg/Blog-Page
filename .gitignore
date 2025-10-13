@@ -32,6 +32,7 @@ build/
 *.db
 *.db-journal
 testDb.js
+fixReviews.js
 
 # OS files
 .DS_Store

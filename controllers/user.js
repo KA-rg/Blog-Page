@@ -1,24 +1,83 @@
 const User = require("../models/user.js");
+const Blog = require("../models/blog.js");
+const Review = require("../models/review.js");
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
+const passport = require("passport");
 
 // Render signup form
 module.exports.renderSignupForm = (req,res) => {
   res.render("users/signup.ejs");
 };
 
-// Signup logic
+// ============================
+// Signup + Email Verification
+// ============================
 module.exports.signup = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
-    const newUser = new User({ username, email });
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      req.flash("error", "Email already registered.");
+      return res.redirect("/signup");
+    }
+
+    const newUser = new User({
+      username,
+      email,
+      isVerified: false,
+    });
+
     const registeredUser = await User.register(newUser, password);
 
-    req.login(registeredUser, err => {
-      if (err) return next(err);
-      req.flash("success", "Welcome to FailStory!");
-      res.redirect("/");
-    });
-  } catch (e) {
-    req.flash("error", e.message);
+    // Generate email verification token
+    const token = crypto.randomBytes(20).toString("hex");
+    registeredUser.emailVerificationToken = token;
+    await registeredUser.save();
+
+    // Send verification email
+    const verifyUrl = `http://${req.headers.host}/verify-email/${token}`;
+    const mailOptions = {
+      to: registeredUser.email,
+      from: process.env.EMAIL_USER,
+      subject: "Verify your FailStory Account",
+      text: `Hello ${registeredUser.username},\n\nPlease verify your email by clicking this link:\n\n${verifyUrl}\n\nIf you did not request this, please ignore it.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    req.flash("success", "A verification email has been sent to your inbox. Please verify to continue.");
+    res.redirect("/login");
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Signup failed. Please try again.");
+    res.redirect("/signup");
+  }
+};
+
+// ============================
+// Verify Email
+// ============================
+module.exports.verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const user = await User.findOne({ emailVerificationToken: token });
+
+    if (!user) {
+      req.flash("error", "Invalid or expired verification link.");
+      return res.redirect("/signup");
+    }
+
+    user.isVerified = true;
+    user.emailVerificationToken = undefined;
+    await user.save();
+
+    req.flash("success", "Your email has been verified! You can now log in.");
+    res.redirect("/login");
+  } catch (err) {
+    console.error("Email verification error:", err);
+    req.flash("error", "Failed to verify email.");
     res.redirect("/signup");
   }
 };
@@ -28,11 +87,25 @@ module.exports.renderLoginForm = (req,res) => {
   res.render("users/login.ejs");
 };
 
-// Login logic
-module.exports.login = (req,res) => {
-  req.flash("success", "Welcome back!");
-  const redirectUrl = res.locals.redirect || "/";
-  res.redirect(redirectUrl);
+// ============================
+// Login logic (only verified users)
+// ============================
+module.exports.login = async (req, res) => {
+  try {
+    if (!req.user.isVerified) {
+      req.logout(() => {});
+      req.flash("error", "Please verify your email before logging in.");
+      return res.redirect("/login");
+    }
+
+    req.flash("success", "Welcome back!");
+    const redirectUrl = res.locals.redirect || "/";
+    res.redirect(redirectUrl);
+  } catch (err) {
+    console.error(err);
+    req.flash("error", "Login failed.");
+    res.redirect("/login");
+  }
 };
 
 // Logout
@@ -46,16 +119,26 @@ module.exports.logout = (req, res, next) => {
 
 // Show profile
 module.exports.showProfile = async (req, res) => {
-  if (!req.user) {
-    req.flash("error", "You must be logged in to view your profile");
-    return res.redirect("/login");
+  try {
+    if (!req.user) {
+      req.flash("error", "You must be logged in to view your profile");
+      return res.redirect("/login");
+    }
+
+    // Get all blogs authored by user
+    const blogs = await Blog.find({ author: req.user._id }).sort({ createdAt: -1 });
+
+    // Get all reviews authored by user and populate blog
+    const reviews = await Review.find({ author: req.user._id })
+      .populate("blog")
+      .sort({ createdAt: -1 });
+
+    res.render("users/profile", { user: req.user, blogs, reviews });
+  } catch (err) {
+    console.error("Profile load error:", err);
+    req.flash("error", "Failed to load profile");
+    res.redirect("/");
   }
-
-  const user = await User.findById(req.user._id)
-    .populate("blogs")
-    .populate({ path: "reviews", populate: { path: "blog" } });
-
-  res.render("users/profile", { user });
 };
 
 // Render edit profile form
@@ -122,9 +205,6 @@ module.exports.updateProfile = async (req, res, next) => {
     res.redirect("/users/edit");
   }
 };
-
-const crypto = require("crypto");
-const nodemailer = require("nodemailer");
 
 // Render forgot password form
 module.exports.renderForgotForm = (req,res) => {
@@ -208,4 +288,37 @@ module.exports.resetPassword = async (req,res) => {
 
   req.flash("success", "Password has been reset! You can now login.");
   res.redirect("/login");
+};
+
+// ============================
+// Google OAuth routes
+// ============================
+// module.exports.googleAuth = passport.authenticate("google", {
+//   scope: ["profile", "email"],
+// });
+
+// module.exports.googleCallback = [
+//   passport.authenticate("google", {
+//     failureRedirect: "/login",
+//     failureFlash: true,
+//   }),
+//   (req, res) => {
+//     req.flash("success", "Logged in with Google!");
+//     res.redirect("/");
+//   },
+// ];
+
+// GOOGLE AUTH ROUTES
+module.exports.googleAuth = passport.authenticate("google", {
+  scope: ["profile", "email"],
+});
+
+module.exports.googleCallback = passport.authenticate("google", {
+  failureRedirect: "/login",
+  failureFlash: true,
+});
+
+module.exports.googleRedirect = (req, res) => {
+  req.flash("success", "Logged in successfully with Google!");
+  res.redirect("/");
 };

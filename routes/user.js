@@ -11,6 +11,9 @@ router
   .get(userController.renderSignupForm)
   .post(wrapAsync(userController.signup));
 
+  // Verify email (separate route)
+router.get("/verify-email/:token", userController.verifyEmail);
+
 // Login
 router
   .route("/login")
@@ -42,5 +45,8 @@ router.post("/forgot", userController.forgotPassword);
 router.get("/reset/:token", userController.renderResetPasswordForm);
 router.post("/reset/:token", userController.resetPassword);
 
+// google auth routes
+router.get("/auth/google", userController.googleAuth);
+router.get("/auth/google/callback", userController.googleCallback);
 
 module.exports = router;
