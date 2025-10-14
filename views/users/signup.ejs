@@ -1,8 +1,78 @@
 <% layout('layouts/boilerplate') %>
 
-<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh; background-color: #f8f9fa;">
+<style>
+  body {
+    background-color: #f8f9fa;
+    font-family: "Poppins", sans-serif;
+  }
+
+  .card {
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .card:hover {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+  }
+
+  .form-control {
+    transition: all 0.25s ease;
+    border: 1px solid #ced4da;
+  }
+
+  .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 8px rgba(13, 110, 253, 0.25);
+  }
+
+  .btn-primary {
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
+  }
+
+  a.text-primary:hover {
+    text-decoration: underline;
+  }
+
+  /* Google Button Adjustment */
+  .btn-outline-danger {
+    border-width: 1.8px;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-outline-danger i {
+    font-size: 1.1rem;
+  }
+
+  .btn-outline-danger:hover {
+    background-color: #ea4335;
+    color: white;
+    box-shadow: 0 4px 12px rgba(234, 67, 53, 0.3);
+    transform: translateY(-1px);
+  }
+
+  hr {
+    opacity: 0.15;
+  }
+
+  .fw-semibold {
+    font-weight: 600 !important;
+  }
+</style>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
   <div class="col-md-5 col-lg-4">
-    <div class="card shadow-lg rounded-4 border-0 p-4">
+    <div class="card shadow-lg rounded-4 p-4">
       <h2 class="text-center mb-4 fw-bold text-primary">Sign Up</h2>
 
       <form action="/signup" method="POST" class="needs-validation" novalidate>
@@ -56,12 +126,14 @@
       <hr class="my-3">
 
       <!-- Login Link -->
-      <p class="text-center mb-0">
+      <p class="text-center mb-3">
         Already have an account? <a href="/login" class="fw-semibold text-primary">Login</a>
       </p>
+
       <!-- Google Login Button -->
-      <a href="/auth/google" class="btn btn-outline-danger btn-lg w-100 rounded-3 mb-2">
-        <i class="bi bi-google"></i> Login with Google
+      <a href="/auth/google" class="btn btn-outline-danger btn-lg w-100 rounded-3">
+        <i class="bi bi-google"></i>
+        Login with Google
       </a>
     </div>
   </div>

@@ -48,5 +48,6 @@ router.post("/reset/:token", userController.resetPassword);
 // google auth routes
 router.get("/auth/google", userController.googleAuth);
 router.get("/auth/google/callback", userController.googleCallback);
+router.get("/auth/google/callback", userController.googleRedirect);
 
 module.exports = router;
