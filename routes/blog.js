@@ -9,6 +9,8 @@ const upload = multer({ storage });
 
 router.post("/:id/like", isLoggedIn, blogController.likeBlog); // 👈 Like route
 
+router.get("/category/:tag", blogController.category);
+
 // Toggle save
 router
   .get('/saved', isLoggedIn, blogController.savedBlog)

@@ -150,6 +150,17 @@ app.use(setNotificationCount);
 //   next();
 // });
 
+const allTags = [
+  "Travel", "Food", "Tech", "Health", "Education",
+  "Sports", "Music", "Culture", "Wellness", "Awareness",
+  "Work", "Technology", "Lifestyle", "Fitness", "Adventure", "Budget"
+];
+
+app.use((req, res, next) => {
+  res.locals.tags = allTags;
+  next();
+});
+
 // 6. Routers
 app.use("/blogs", blogRouter);
 app.use("/blogs/:id/reviews", reviewRouter);

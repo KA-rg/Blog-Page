@@ -27,9 +27,9 @@
             Categories
           </a>
           <ul class="dropdown-menu dropdown-menu-custom" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="/category/tech">Tech</a></li>
-            <li><a class="dropdown-item" href="/category/lifestyle">Lifestyle</a></li>
-            <li><a class="dropdown-item" href="/category/travel">Travel</a></li>
+            <% tags.forEach(tag => { %>
+              <li><a class="dropdown-item" href="/blogs/category/<%= tag %>"><%= tag %></a></li>
+            <% }) %>
           </ul>
         </li>
 
@@ -46,7 +46,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-custom" aria-labelledby="userDropdown">
               <li><a class="dropdown-item" href="/profile">Profile</a></li>
-              <li><a class="dropdown-item" href="blogs/saved">Saved</a></li>
+              <li><a class="dropdown-item" href="/blogs/saved">Saved</a></li>
               <li>
                 <% if (currUser && currUser._id.toString() === process.env.ADMIN_ID) { %>
                   <a class="dropdown-item" href="/notifications">Notifications

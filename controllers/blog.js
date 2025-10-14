@@ -2,6 +2,21 @@ const { isOwner } = require("../middleware");
 const Blog = require("../models/blog");
 const Notification = require("../models/notification");
 
+
+// 📂 Show blogs by tag
+module.exports.category = async (req, res) => {
+  try {
+    const tag = req.params.tag;
+    const blogs = await Blog.find({ tags: tag }).sort({ createdAt: -1 });
+
+    res.render("blogs/category", { tag, blogs });
+  } catch (err) {
+    console.error("Category page error:", err);
+    req.flash("error", "Failed to load category blogs");
+    res.redirect("/blogs");
+  }
+};
+
 module.exports.home = async (req, res, next) => {
   let { search } = req.query;
 
