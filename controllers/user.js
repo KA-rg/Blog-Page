@@ -185,7 +185,7 @@ module.exports.showProfile = async (req, res) => {
     }
 
     // Get all blogs authored by user
-    const blogs = await Blog.find({ author: req.user._id }).sort({ createdAt: -1 });
+    const blogs = await Blog.find({ owner: req.user._id }).sort({ createdAt: -1 });
 
     // Get all reviews authored by user and populate blog
     const reviews = await Review.find({ author: req.user._id })
