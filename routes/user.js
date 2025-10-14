@@ -50,4 +50,14 @@ router.get("/auth/google", userController.googleAuth);
 router.get("/auth/google/callback", userController.googleCallback);
 router.get("/auth/google/callback", userController.googleRedirect);
 
+// Step 1: Send OTP
+router.post("/send-otp", wrapAsync(userController.sendOTP));
+
+// Step 2: Verify OTP
+router.post("/verify-otp", wrapAsync(userController.verifyOTP));
+
+// Step 3: Final signup (after OTP verified)
+router.post("/signup", wrapAsync(userController.signup));
+
+
 module.exports = router;

@@ -1,0 +1,116 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+  body {
+    background-color: #f8f9fa;
+    font-family: "Poppins", sans-serif;
+  }
+  .card {
+    border: none;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem;
+  }
+  .btn-primary {
+    transition: all 0.3s ease;
+  }
+  .btn-primary:disabled {
+    background-color: gray;
+    border-color: gray;
+    cursor: not-allowed;
+  }
+</style>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="col-md-5 col-lg-4">
+    <div class="card p-4">
+      <h3 class="text-center mb-3 text-primary fw-bold">Verify Your Email</h3>
+
+      <form action="/verify-otp" method="POST">
+        <input type="hidden" name="email" value="<%= email %>">
+
+        <div class="mb-3">
+          <input
+            name="otp"
+            id="otp"
+            type="text"
+            class="form-control form-control-lg rounded-3"
+            placeholder="Enter OTP"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 btn-lg mb-3">
+          Verify OTP
+        </button>
+      </form>
+
+      <form action="/resend-otp" method="POST" id="resendForm">
+        <input type="hidden" name="email" value="<%= email %>">
+        <button
+          id="resendBtn"
+          type="submit"
+          class="btn btn-outline-secondary w-100"
+        >
+          Resend OTP
+        </button>
+      </form>
+
+      <p id="timerText" class="text-center text-muted mt-2"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const resendBtn = document.getElementById('resendBtn');
+  const timerText = document.getElementById('timerText');
+
+  // Disable resend button initially for 60s if just sent
+  let timeLeft = 60;
+
+  resendBtn.addEventListener('click', function (event) {
+    event.preventDefault();
+    if (resendBtn.disabled) return;
+
+    // send form
+    resendBtn.disabled = true;
+    resendBtn.innerText = "Sending...";
+
+    fetch("/resend-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `email=<%= email %>`
+    })
+      .then(res => {
+        if (res.ok) {
+          startTimer(60);
+        } else {
+          resendBtn.disabled = false;
+          resendBtn.innerText = "Resend OTP";
+        }
+      })
+      .catch(() => {
+        resendBtn.disabled = false;
+        resendBtn.innerText = "Resend OTP";
+      });
+  });
+
+  function startTimer(seconds) {
+    timeLeft = seconds;
+    resendBtn.disabled = true;
+    resendBtn.innerText = "Wait 60s";
+    timerText.innerText = `Please wait ${timeLeft}s before requesting again`;
+
+    const timer = setInterval(() => {
+      timeLeft--;
+      timerText.innerText = `Please wait ${timeLeft}s before requesting again`;
+      resendBtn.innerText = `Wait ${timeLeft}s`;
+
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        resendBtn.disabled = false;
+        resendBtn.innerText = "Resend OTP";
+        timerText.innerText = "";
+      }
+    }, 1000);
+  }
+</script>

@@ -10,51 +10,110 @@ module.exports.renderSignupForm = (req,res) => {
   res.render("users/signup.ejs");
 };
 
-// ============================
-// Signup + Email Verification
-// ============================
-module.exports.signup = async (req, res, next) => {
-  try {
-    const { username, email, password } = req.body;
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      req.flash("error", "Email already registered.");
+// STEP 1: Send OTP
+module.exports.sendOTP = async (req, res) => {
+  const { email } = req.body;
+
+  let user = await User.findOne({ email });
+
+  // If already verified
+  if (user && user.isVerified) {
+    req.flash("error", "Email already registered and verified.");
+    return res.redirect("/login");
+  }
+
+  // If existing but not verified
+  if (user) {
+    const now = Date.now();
+
+    // 1 minute cooldown before next resend
+    if (user.lastOTPTime && now - user.lastOTPTime < 60 * 1000) {
+      const remaining = Math.ceil((60 * 1000 - (now - user.lastOTPTime)) / 1000);
+      req.flash("error", `Please wait ${remaining}s before requesting a new OTP.`);
       return res.redirect("/signup");
     }
 
-    const newUser = new User({
-      username,
-      email,
-      isVerified: false,
-    });
+    // Max 3 resend limit
+    if (user.resendCount >= 3) {
+      req.flash("error", "You’ve reached the maximum OTP resend limit (3 times).");
+      return res.redirect("/signup");
+    }
 
-    const registeredUser = await User.register(newUser, password);
-
-    // Generate email verification token
-    const token = crypto.randomBytes(20).toString("hex");
-    registeredUser.emailVerificationToken = token;
-    await registeredUser.save();
-
-    // Send verification email
-    const verifyUrl = `http://${req.headers.host}/verify-email/${token}`;
-    const mailOptions = {
-      to: registeredUser.email,
-      from: process.env.EMAIL_USER,
-      subject: "Verify your FailStory Account",
-      text: `Hello ${registeredUser.username},\n\nPlease verify your email by clicking this link:\n\n${verifyUrl}\n\nIf you did not request this, please ignore it.`,
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    req.flash("success", "A verification email has been sent to your inbox. Please verify to continue.");
-    res.redirect("/login");
-  } catch (err) {
-    console.error(err);
-    req.flash("error", "Signup failed. Please try again.");
-    res.redirect("/signup");
+    user.resendCount += 1;
+    user.lastOTPTime = now;
+  } else {
+    // Create new user record
+    user = new User({ email, resendCount: 1, lastOTPTime: Date.now() });
   }
+
+  // Generate new OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  user.emailOTP = otp;
+  user.emailOTPExpires = Date.now() + 10 * 60 * 1000; // 10 min validity
+  await user.save();
+
+  // Send Email
+  await transporter.sendMail({
+    to: email,
+    from: process.env.EMAIL_USER,
+    subject: "Your OTP for Email Verification",
+    text: `Your OTP code is ${otp}. It is valid for 10 minutes.`,
+  });
+
+  req.flash("success", "OTP sent successfully to your email!");
+  res.render("users/verify-otp", { email });
 };
+
+
+// STEP 2: Verify OTP
+module.exports.verifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user || user.emailOTP !== otp || Date.now() > user.emailOTPExpires) {
+    req.flash("error", "Invalid or expired OTP.");
+    return res.redirect("/signup");
+  }
+
+  user.isVerified = true;
+  user.emailOTP = undefined;
+  user.emailOTPExpires = undefined;
+  user.resendCount = 0;
+  user.lastOTPTime = undefined;
+  await user.save();
+
+  // proceed to set username & password
+  res.render("users/final-signup", { email });
+};
+
+// ============================
+// Signup + Email Verification
+// ============================
+module.exports.signup = async (req, res) => {
+  const { email, username, password } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user || !user.isVerified) {
+    req.flash("error", "Please verify your email first.");
+    return res.redirect("/signup");
+  }
+
+  user.username = username;
+  await user.setPassword(password);
+  await user.save();
+
+  req.flash("success", "Account created successfully!");
+  res.redirect("/login");
+};
+
 
 // ============================
 // Verify Email

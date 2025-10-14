@@ -9,6 +9,13 @@ const userSchema = new Schema({
   resetPasswordToken: String,
   resetPasswordExpires: Date,
 
+  emailOTP: String,
+  emailOTPExpires: Date,
+  
+  resendCount: { type: Number, default: 0 },
+  lastOTPTime: Date,
+
+
   // --- For Email Verification ---
   isVerified: { type: Boolean, default: false },
   emailVerificationToken: String,
