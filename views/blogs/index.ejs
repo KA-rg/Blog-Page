@@ -1,7 +1,7 @@
 <% layout('layouts/boilerplate') %>
 
 <!-- Hero Section -->
-<section class="hero-section text-center text-light d-flex flex-column justify-content-center align-items-center">
+<section class="hero-section text-center text-light d-flex flex-column justify-content-center align-items-center" data-aos="fade-down">
   <div class="container">
     <h1 class="display-4 fw-bold mb-3">Welcome to <span class="text-accent">FailSTORY</span></h1>
     <p class="lead mb-4">Your daily dose of stories, blogs, and insights.</p>
@@ -11,11 +11,11 @@
 
 <!-- ========== TRENDING ========== -->
 <div class="container my-5">
-  <h3 class="section-title mb-4 text-accent">🔥 Trending</h3>
+  <h3 class="section-title mb-4 text-accent" data-aos="fade-up">🔥 Trending</h3>
   <div class="row g-4 row-cols-lg-4 row-cols-md-2 row-cols-1">
     <% trending.forEach(blog => { %>
-      <div class="col blog-card">
-        <div class="card listing-card shadow-sm h-100 position-relative">
+      <div class="col blog-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="card listing-card shadow-sm h-100 position-relative tilt-card">
 
           <!-- More Options -->
           <div class="dropdown more-options">
@@ -35,9 +35,7 @@
                   <% } %>
                 </button>
               </li>
-              <li>
-                <a class="dropdown-item" href="/blogs/<%= blog._id %>">🔎 View Blog</a>
-              </li>
+              <li><a class="dropdown-item" href="/blogs/<%= blog._id %>">🔎 View Blog</a></li>
             </ul>
           </div>
 
@@ -73,33 +71,22 @@
 
 <!-- ========== MOST READS ========== -->
 <div class="container my-5">
-  <h3 class="section-title mb-4 text-accent">📖 Most Reads</h3>
+  <h3 class="section-title mb-4 text-accent" data-aos="fade-up">📖 Most Reads</h3>
   <div class="row g-4 row-cols-lg-4 row-cols-md-2 row-cols-1">
     <% mostReads.forEach(blog => { %>
-      <div class="col blog-card">
-        <div class="card listing-card shadow-sm h-100 position-relative">
-
-          <!-- More Options -->
+      <div class="col blog-card" data-aos="fade-up" data-aos-delay="150">
+        <div class="card listing-card shadow-sm h-100 position-relative tilt-card">
           <div class="dropdown more-options">
             <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">⋮</button>
             <ul class="dropdown-menu">
               <li><button class="dropdown-item share-btn" data-url="/blogs/<%= blog._id %>">📤 Share</button></li>
               <li>
-                <button 
-                  class="dropdown-item save-btn" 
-                  data-id="<%= blog._id %>"
-                  data-saved="<%= currUser && blog.savedBy && blog.savedBy.some(id => id && id.toString() === currUser._id.toString()) ? 'true' : 'false' %>"
-                >
-                  <% if (currUser && blog.savedBy && blog.savedBy.some(id => id && id.toString() === currUser._id.toString())) { %>
-                    ✅ Saved
-                  <% } else { %>
-                    💾 Save
-                  <% } %>
+                <button class="dropdown-item save-btn" data-id="<%= blog._id %>"
+                  data-saved="<%= currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString()) ? 'true' : 'false' %>">
+                  <% if (currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString())) { %>✅ Saved<% } else { %>💾 Save<% } %>
                 </button>
               </li>
-              <li>
-                <a class="dropdown-item" href="/blogs/<%= blog._id %>">🔎 View Blog</a>
-              </li>
+              <li><a class="dropdown-item" href="/blogs/<%= blog._id %>">🔎 View Blog</a></li>
             </ul>
           </div>
 
@@ -115,14 +102,9 @@
             </div>
           </a>
 
-          <!-- Like Button -->
           <button class="btn btn-sm like-btn" data-id="<%= blog._id %>">
             <span class="heart">
-              <% if (currUser && blog.likedBy && blog.likedBy.some(id => id && id.toString() === currUser._id.toString())) { %>
-                ❤️
-              <% } else { %>
-                🤍
-              <% } %>
+              <% if (currUser && blog.likedBy && blog.likedBy.some(id => id && id.toString() === currUser._id.toString())) { %>❤️<% } else { %>🤍<% } %>
             </span>
             <span class="like-count"><%= blog.likes %></span>
           </button>
@@ -134,33 +116,23 @@
 
 <!-- ========== POPULAR ========== -->
 <div class="container my-5">
-  <h3 class="section-title mb-4 text-accent">⭐ Popular</h3>
+  <h3 class="section-title mb-4 text-accent" data-aos="fade-up">⭐ Popular</h3>
   <div class="row g-4 row-cols-lg-4 row-cols-md-2 row-cols-1">
     <% popular.forEach(blog => { %>
-      <div class="col blog-card">
-        <div class="card listing-card shadow-sm h-100 position-relative">
+      <div class="col blog-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="card listing-card shadow-sm h-100 position-relative tilt-card">
 
-          <!-- More Options -->
           <div class="dropdown more-options">
             <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">⋮</button>
             <ul class="dropdown-menu">
               <li><button class="dropdown-item share-btn" data-url="/blogs/<%= blog._id %>">📤 Share</button></li>
               <li>
-                <button 
-                  class="dropdown-item save-btn" 
-                  data-id="<%= blog._id %>"
-                  data-saved="<%= currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString()) ? 'true' : 'false' %>"
-                >
-                  <% if (currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString())) { %>
-                    ✅ Saved
-                  <% } else { %>
-                    💾 Save
-                  <% } %>
+                <button class="dropdown-item save-btn" data-id="<%= blog._id %>"
+                  data-saved="<%= currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString()) ? 'true' : 'false' %>">
+                  <% if (currUser && blog.savedBy && blog.savedBy.some(id => id.toString() === currUser._id.toString())) { %>✅ Saved<% } else { %>💾 Save<% } %>
                 </button>
               </li>
-              <li>
-                <a class="dropdown-item" href="/blogs/<%= blog._id %>">🔎 View Blog</a>
-              </li>
+              <li><a class="dropdown-item" href="/blogs/<%= blog._id %>">🔎 View Blog</a></li>
             </ul>
           </div>
 
@@ -176,14 +148,9 @@
             </div>
           </a>
 
-          <!-- Like Button -->
           <button class="btn btn-sm like-btn" data-id="<%= blog._id %>">
             <span class="heart">
-              <% if (currUser && blog.likedBy && blog.likedBy.some(id => id && id.toString() === currUser._id.toString())) { %>
-                ❤️
-              <% } else { %>
-                🤍
-              <% } %>
+              <% if (currUser && blog.likedBy && blog.likedBy.some(id => id && id.toString() === currUser._id.toString())) { %>❤️<% } else { %>🤍<% } %>
             </span>
             <span class="like-count"><%= blog.likes %></span>
           </button>
@@ -194,7 +161,7 @@
 </div>
 
 <!-- CTA Section -->
-<section class="cta-section text-center py-5">
+<section class="cta-section text-center py-5" data-aos="fade-up">
   <div class="container">
     <h2 class="fw-bold mb-3">Got a story to share?</h2>
     <p class="mb-4">Join our community and share your experiences with the world.</p>
@@ -205,25 +172,35 @@
 <!-- Toast container -->
 <div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
 
+<!-- AOS Animations -->
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+
 <style>
 /* Hero Section */
 .hero-section {
   background: linear-gradient(135deg, #002855, #001233);
   min-height: 70vh;
   padding: 60px 20px;
+  perspective: 1000px;
+  transform-style: preserve-3d;
 }
 
 .text-accent { color: #0466c8; }
 
-/* Buttons */
 .btn-accent {
   background-color: #0466c8;
   border: none;
   color: #fff;
+  transition: all 0.3s ease;
 }
-.btn-accent:hover { background-color: #0353a4; }
+.btn-accent:hover {
+  background-color: #0353a4;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 15px rgba(4,102,200,0.4);
+}
 
-/* Section Titles */
 .section-title { font-weight: bold; color: #023e7d; }
 
 /* Blog Cards */
@@ -232,12 +209,14 @@
   border-radius: 12px;
   overflow: hidden;
   background-color: #f9f9f9;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
 }
-.listing-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+.tilt-card:hover {
+  transform: rotateY(6deg) rotateX(4deg) scale(1.03);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
 }
+
 .card-img-top { object-fit: cover; height: 180px; }
 .card-img-placeholder { background: #5c677d; height: 180px; width: 100%; }
 
@@ -252,8 +231,9 @@
   background: #fff;
   border-radius: 20px;
   padding: 4px 10px;
+  transition: all 0.2s ease;
 }
-.like-btn:hover { background: #0466c8; color: #fff; }
+.like-btn:hover { background: #0466c8; color: #fff; transform: scale(1.05); }
 
 /* More Options */
 .more-options { position: absolute; top: 12px; right: 12px; z-index: 1000; }
@@ -264,12 +244,91 @@
   border-radius: 12px;
   padding: 4px 10px;
   font-size: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+.more-options .dropdown-toggle:hover { background: #0466c8; }
+.more-options .dropdown-toggle::after { display: none; }
+.more-options .dropdown-menu {
+  background-color: #001233;
+  border-radius: 10px;
+  border: none;
+  padding: 6px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.more-options .dropdown-item {
+  color: #d0d0d0;
+  font-size: 0.9rem;
+}
+.more-options .dropdown-item:hover {
+  background-color: #0353a4;
+  color: #ffffff;
+}
+</style>
+
+<style>
+/* Container */
+.container {
+  perspective: 1200px;
+}
+
+/* Card Base */
+.listing-card {
+  border: none;
+  border-radius: 16px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+/* 3D Hover Motion */
+.listing-card:hover {
+  transform: rotateX(4deg) rotateY(-4deg) translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+}
+
+/* Image */
+.card-img-top {
+  object-fit: cover;
+  height: 180px;
+  transition: transform 0.3s ease;
+}
+.listing-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+/* Placeholder */
+.card-img-placeholder {
+  background: #5c677d;
+  height: 180px;
+  width: 100%;
+}
+
+/* Dropdown (top-right) */
+.more-options {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+}
+.more-options .dropdown-toggle {
+  background: #0353a4;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 1rem;
   transition: background 0.2s ease, transform 0.15s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
-.more-options .dropdown-toggle:hover,
-.more-options .dropdown-toggle:focus { background: #0466c8; transform: scale(1.05); }
-.more-options .dropdown-toggle::after { display: none; }
+.more-options .dropdown-toggle:hover {
+  background: #0466c8;
+  transform: scale(1.05);
+}
+.more-options .dropdown-toggle::after {
+  display: none;
+}
 .more-options .dropdown-menu {
   background-color: #001233;
   border-radius: 10px;
@@ -286,8 +345,40 @@
   background-color: #0353a4;
   color: #ffffff;
 }
+
+/* Like Button */
+.like-btn {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  font-size: 0.9rem;
+  border: 1px solid #0466c8;
+  color: #0466c8;
+  background: #fff;
+  border-radius: 20px;
+  padding: 4px 10px;
+  transition: all 0.2s ease;
+}
+.like-btn:hover {
+  background: #0466c8;
+  color: #fff;
+  transform: scale(1.1);
+}
 </style>
+
 <script>
+AOS.init({ duration: 800, once: true, offset: 80 });
+
+// Subtle scroll-based tilt
+window.addEventListener('scroll', () => {
+  document.querySelectorAll('.tilt-card').forEach(card => {
+    const rect = card.getBoundingClientRect();
+    const offset = rect.top / window.innerHeight;
+    card.style.transform = `rotateY(${(offset - 0.5) * 10}deg) rotateX(${(0.5 - offset) * 6}deg)`;
+  });
+});
+
+// ----- TOAST -----
 function showToast(message, type = "success") {
   const toastId = "toast-" + Date.now();
   const toast = `
@@ -301,19 +392,26 @@ function showToast(message, type = "success") {
   setTimeout(() => { document.getElementById(toastId)?.remove(); }, 3000);
 }
 
-// ----- SHARE BUTTON -----
-document.querySelectorAll(".share-btn").forEach(btn => {
-  btn.addEventListener("click", async () => {
-    const url = window.location.origin + btn.dataset.url;
-    if (navigator.share) {
-      try { await navigator.share({ title: "Check out this blog!", url }); }
-      catch (err) { console.log("Share cancelled", err); }
-    } else {
-      try { await navigator.clipboard.writeText(url); showToast("📋 Blog link copied!"); }
-      catch { showToast("❌ Failed to copy link.", "danger"); }
-    }
+ // ----- SHARE BUTTON -----
+  document.querySelectorAll(".share-btn, .share-btn-foot").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const url = window.location.origin + btn.dataset.url;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Check out this blog!", url });
+        } catch (err) {
+          console.log("Share cancelled", err);
+        }
+      } else {
+        try {
+          await navigator.clipboard.writeText(url);
+          showToast("📋 Link copied to clipboard!", "success");
+        } catch (err) {
+          showToast("❌ Failed to copy link.", "error");
+        }
+      }
+    });
   });
-});
 
 // ----- LIKE BUTTON -----
 document.querySelectorAll(".like-btn").forEach(btn => {
