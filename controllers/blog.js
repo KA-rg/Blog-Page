@@ -281,22 +281,43 @@ module.exports.renderEditForm = async (req, res, next) => {
   }
 };
 
-module.exports.createBlog = async (req,res,next) => {
-  let url = req.file.path;
-  let filename = req.file.filename;
-  const newBlog = new Blog(req.body.blog);
-  newBlog.owner = req.user._id;
-  newBlog.image = { url, filename };
-  await newBlog.save();
-  // ✅ Create admin notification
-    await Notification.create({
-      type: "BLOG_CREATED",
-      message: `${req.user.username} created a new blog: ${newBlog.title}`,
-      blog: newBlog._id,
-      link: `/blogs/${newBlog._id}`
+module.exports.createBlog = async (req, res) => {
+  try {
+    const { newTag } = req.body;
+    let { blog } = req.body;
+
+    // If user entered a new tag, add it to enum if not already present
+    if (newTag && !Blog.schema.path("tags").caster.enumValues.includes(newTag)) {
+      Blog.schema.path("tags").caster.enumValues.push(newTag);
+      blog.tags = blog.tags ? [...blog.tags, newTag] : [newTag];
+    }
+
+    // Create the blog with "pending" status initially
+    const newBlog = new Blog({
+      ...blog,
+      author: req.user._id, // if using passport
+      status: "pending",
     });
-  req.flash("success", "New Blog Created!");
-  res.redirect("/blogs");
+
+    // Save the blog
+    await newBlog.save();
+
+    // Create admin notification
+    const notification = new Notification({
+      type: "blog_approval",
+      message: `New blog "${newBlog.title}" awaiting approval.`,
+      blog: newBlog._id,
+      createdAt: new Date(),
+    });
+    await notification.save();
+
+    req.flash("success", "Blog submitted for admin approval!");
+    res.redirect("/blogs");
+  } catch (e) {
+    console.log(e);
+    req.flash("error", "Something went wrong while creating blog.");
+    res.redirect("/blogs/new");
+  }
 };
 
 module.exports.destroyBlog = async (req,res,next) => {

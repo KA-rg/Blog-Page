@@ -19,6 +19,11 @@ const blogSchema = new Schema({
     type: String,
     enum: ["Travel", "Food", "Tech", "Health", "Education", "Sports", "Music", "Culture", "Wellness", "Awareness", "Work", "Technology", "Lifestyle", "Fitness", "Adventure", "Budget"], // fixed list
   }],
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending"
+  },
   views: { type: Number, default: 0 },   // 👈 for Most Reads
   likes: { type: Number, default: 0 },  
   likedBy: { type: [Schema.Types.ObjectId], ref: "User", default: [] },  // 👈 track users who liked

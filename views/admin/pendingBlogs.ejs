@@ -1,0 +1,68 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container my-5">
+  <h2 class="fw-bold mb-4 text-center">Pending Blogs for Approval</h2>
+
+  <% if (blogs.length === 0) { %>
+    <div class="alert alert-info text-center shadow-sm rounded-4">
+      No pending blogs found.
+    </div>
+  <% } else { %>
+    <table class="table table-hover align-middle shadow-sm">
+      <thead class="table-light">
+        <tr>
+          <th>Title</th>
+          <th>Owner</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% blogs.forEach(blog => { %>
+          <tr>
+            <td>
+              <a href="/blogs/<%= blog._id %>" target="_blank" class="fw-semibold text-decoration-none text-dark">
+                <%= blog.title %>
+              </a>
+            </td>
+            <td><%= blog.owner ? blog.owner.username : "Deleted User" %></td>
+            <td><%= blog.createdAt ? blog.createdAt.toDateString() : "N/A" %></td>
+            <td>
+              <form method="POST" action="/admin/blogs/<%= blog._id %>/approve" class="d-inline">
+                <button class="btn btn-success btn-sm">
+                  <i class="fa-solid fa-check me-1"></i> Approve
+                </button>
+              </form>
+
+              <form method="POST" action="/admin/blogs/<%= blog._id %>/delete" class="d-inline">
+                <button class="btn btn-danger btn-sm">
+                  <i class="fa-solid fa-trash me-1"></i> Delete
+                </button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>
+
+<style>
+  .table {
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+  th {
+    font-weight: 600;
+  }
+  td {
+    vertical-align: middle !important;
+  }
+  .btn-sm {
+    padding: 2px 10px;
+    font-size: 0.9rem;
+  }
+  .alert {
+    font-size: 1.1rem;
+  }
+</style>

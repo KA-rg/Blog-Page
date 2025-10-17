@@ -286,7 +286,7 @@ module.exports.listUsers = async (req, res) => {
 module.exports.resetUserPassword = async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) return res.redirect("/admin/users");
-  user.password = "temporary123"; // hash in production
+  user.password = "failstoryisbest"; // hash in production
   await user.save();
   req.flash("success", "Password reset to temporary123");
   res.redirect("/admin/users");
@@ -299,22 +299,151 @@ module.exports.disableUser = async (req, res) => {
 };
 
 // ------------------ Blog Moderation ------------------
+// ------------------ LIST BLOGS ------------------
 module.exports.listBlogs = async (req, res) => {
-  const blogs = await Blog.find().populate("owner");
-  res.render("admin/blogs", { blogs });
+  try {
+    const blogs = await Blog.find().populate("owner");
+
+    // Count by status
+    const totalBlogs = blogs.length;
+    const pendingBlogs = blogs.filter(b => b.status === "pending").length;
+    const approvedBlogs = blogs.filter(b => b.status === "approved").length;
+    const rejectedBlogs = blogs.filter(b => b.status === "rejected").length;
+
+    res.render("admin/blogs", {
+      blogs,
+      totalBlogs,
+      pendingBlogs,
+      approvedBlogs,
+      rejectedBlogs
+    });
+  } catch (err) {
+    console.error("Error listing blogs:", err);
+    req.flash("error", "Something went wrong while loading blogs.");
+    res.redirect("/");
+  }
 };
 
-module.exports.deleteBlog = async (req, res) => {
-  await Blog.findByIdAndDelete(req.params.id);
-  req.flash("success", "Blog deleted.");
-  res.redirect("/admin/blogs");
-};
-
+// ------------------ APPROVE BLOG ------------------
 module.exports.approveBlog = async (req, res) => {
-  await Blog.findByIdAndUpdate(req.params.id, { approved: true });
-  req.flash("success", "Blog approved.");
+  try {
+    await Blog.findByIdAndUpdate(req.params.id, { status: "approved" });
+    req.flash("success", "✅ Blog approved successfully!");
+  } catch (err) {
+    console.error("Error approving blog:", err);
+    req.flash("error", "Failed to approve blog.");
+  }
   res.redirect("/admin/blogs");
 };
+
+// ------------------ REJECT BLOG ------------------
+module.exports.rejectBlog = async (req, res) => {
+  try {
+    await Blog.findByIdAndUpdate(req.params.id, { status: "rejected" });
+    req.flash("success", "❌ Blog rejected successfully. You can undo this anytime.");
+  } catch (err) {
+    console.error("Error rejecting blog:", err);
+    req.flash("error", "Failed to reject blog.");
+  }
+  res.redirect("/admin/blogs");
+};
+
+// ------------------ UNDO REJECT ------------------
+module.exports.undoRejectBlog = async (req, res) => {
+  try {
+    await Blog.findByIdAndUpdate(req.params.id, { status: "pending" });
+    req.flash("success", "↩️ Rejection undone! Blog set back to pending.");
+  } catch (err) {
+    console.error("Error undoing reject:", err);
+    req.flash("error", "Failed to undo rejection.");
+  }
+  res.redirect("/admin/blogs");
+};
+
+// ------------------ UNDO APPROVE BLOG ------------------
+module.exports.undoApproveBlog = async (req, res) => {
+  try {
+    await Blog.findByIdAndUpdate(req.params.id, { status: "pending" });
+    req.flash("success", "⏪ Approval undone! Blog is back to pending review.");
+  } catch (err) {
+    console.error("Error undoing approval:", err);
+    req.flash("error", "Failed to undo approval.");
+  }
+  res.redirect("/admin/blogs");
+};
+
+// ------------------ DELETE BLOG ------------------
+module.exports.deleteBlog = async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) {
+      req.flash("error", "Blog not found.");
+      return res.redirect("/admin/blogs");
+    }
+
+    // Delete related reviews
+    await Review.deleteMany({ _id: { $in: blog.reviews } });
+
+    // Finally delete the blog
+    await Blog.findByIdAndDelete(req.params.id);
+
+    req.flash("success", "🗑️ Blog permanently deleted from database.");
+  } catch (err) {
+    console.error("Error deleting blog:", err);
+    req.flash("error", "Failed to delete blog.");
+  }
+  res.redirect("/admin/blogs");
+};
+
+// // ------------------ List All Blogs ------------------
+// module.exports.listBlogs = async (req, res) => {
+//   try {
+//     const blogs = await Blog.find().populate("owner");
+//     res.render("admin/blogs", { blogs });
+//   } catch (err) {
+//     console.error("Error loading blogs:", err);
+//     req.flash("error", "Failed to load blogs.");
+//     res.redirect("/");
+//   }
+// };
+
+// ------------------ List Pending Blogs ------------------
+module.exports.pendingBlog = async (req, res) => {
+  try {
+    const blogs = await Blog.find({ status: "pending" }).populate("owner");
+    res.render("admin/pendingBlogs", { blogs });
+  } catch (err) {
+    console.error("Error loading pending blogs:", err);
+    req.flash("error", "Failed to load pending blogs.");
+    res.redirect("/admin/blogs");
+  }
+};
+
+// // ------------------ Approve Blog ------------------
+// module.exports.approveBlog = async (req, res) => {
+//   try {
+//     await Blog.findByIdAndUpdate(req.params.id, { status: "approved" });
+//     req.flash("success", "Blog approved successfully.");
+//     res.redirect("/admin/blogs");
+//   } catch (err) {
+//     console.error("Error approving blog:", err);
+//     req.flash("error", "Failed to approve blog.");
+//     res.redirect("/admin/blogs");
+//   }
+// };
+
+// // ------------------ Delete Blog ------------------
+// module.exports.deleteBlog = async (req, res) => {
+//   try {
+//     await Blog.findByIdAndDelete(req.params.id);
+//     req.flash("success", "Blog deleted successfully.");
+//     res.redirect("/admin/blogs");
+//   } catch (err) {
+//     console.error("Error deleting blog:", err);
+//     req.flash("error", "Failed to delete blog.");
+//     res.redirect("/admin/blogs");
+//   }
+// };
 
 // ------------------ Activity Logs ------------------
 module.exports.viewLogs = async (req, res) => {

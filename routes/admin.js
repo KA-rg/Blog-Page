@@ -15,10 +15,24 @@ router.get("/users", isAdmin, adminController.listUsers);
 router.post("/users/:id/reset-password", isAdmin, adminController.resetUserPassword);
 router.post("/users/:id/disable", isAdmin, adminController.disableUser);
 
-// Blog Moderation
+//blog moderation
+// List all blogs
 router.get("/blogs", isAdmin, adminController.listBlogs);
-router.post("/blogs/:id/delete", isAdmin, adminController.deleteBlog);
+
+// Approve blog
 router.post("/blogs/:id/approve", isAdmin, adminController.approveBlog);
+
+// Undo approval
+router.post("/blogs/:id/undoApprove", isAdmin, adminController.undoApproveBlog);
+
+// Reject blog
+router.post("/blogs/:id/reject", isAdmin, adminController.rejectBlog);
+
+// Undo reject
+router.post("/blogs/:id/undoReject", isAdmin, adminController.undoRejectBlog);
+
+// Delete permanently
+router.post("/blogs/:id/delete", isAdmin, adminController.deleteBlog);
 
 // Activity Logs
 router.get("/logs", isAdmin, adminController.viewLogs);
