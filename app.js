@@ -145,15 +145,26 @@ app.use(setNotificationCount);
 //   res.locals.currUser = req.user;
 //   next();
 // });
+let cachedTags = [];
+let lastFetchTime = 0;
 
-const allTags = [
-  "Travel", "Food", "Tech", "Health", "Education",
-  "Sports", "Music", "Culture", "Wellness", "Awareness",
-  "Work", "Technology", "Lifestyle", "Fitness", "Adventure", "Budget"
-];
+app.use(async (req, res, next) => {
+  const now = Date.now();
+  if (!cachedTags.length || now - lastFetchTime > 5 * 60 * 1000) { // refresh every 5 mins
+    try {
+      cachedTags = await Blog.distinct("tags");
+      lastFetchTime = now;
+    } catch (err) {
+      console.error("Error fetching tags:", err);
+    }
+  }
+  res.locals.tags = cachedTags;
+  next();
+});
+
 
 app.use((req, res, next) => {
-  res.locals.tags = allTags;
+  res.locals.tags = cachedTags;
   next();
 });
 
