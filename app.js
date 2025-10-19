@@ -124,10 +124,6 @@ passport.use(
 
 // 4. Flash + current user locals
 app.use((req, res, next) => {
-  res.locals.messages = {
-    success: req.flash("success"),
-    error: req.flash("error")
-  };
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   res.locals.usernameError = req.flash("usernameError");
