@@ -11,6 +11,7 @@ const blogSchema = new Schema({
   headContent: String,
   content: String,
   author: String,
+  country: String,
   image: {
     filename: String,
     url: String,

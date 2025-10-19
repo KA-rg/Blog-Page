@@ -288,7 +288,7 @@ module.exports.resetUserPassword = async (req, res) => {
   if (!user) return res.redirect("/admin/users");
   user.password = "failstoryisbest"; // hash in production
   await user.save();
-  req.flash("success", "Password reset to temporary123");
+  req.flash("success", "Password reset to failstoryisbest");
   res.redirect("/admin/users");
 };
 
