@@ -17,46 +17,70 @@ module.exports.category = async (req, res) => {
   }
 };
 
+// ------------------ Home Page ------------------
 module.exports.home = async (req, res, next) => {
   let { search } = req.query;
 
-  let allBlog;
-  if (search) {
-    // case-insensitive search on title or location (example)
-    allBlog = await Blog.find({
-      $or: [
-        { title: new RegExp(search, "i") },
-        { headContent: new RegExp(search, "i") }
-      ]
-    });
-  } else {
-    allBlog = await Blog.find({});
-  }
-    const trending = await Blog.find({}).sort({ createdAt: -1 }).limit(8);  // newest first
-    const mostReads = await Blog.find({}).sort({ views: -1 }).limit(8);     // by views
-    const popular = await Blog.find({}).sort({ likes: -1 }).limit(8);       // by likes
-    const blogs = await Blog.find({});
-    const allTags = [...new Set(blogs.flatMap(blog => blog.tags))];
+  // Search only among approved blogs
+  let filter = { status: "approved" };
 
-  res.render("blogs/index", { allBlog, blogs, search, trending, mostReads, popular, allTags });
+  if (search) {
+    filter.$or = [
+      { title: new RegExp(search, "i") },
+      { headContent: new RegExp(search, "i") }
+    ];
+  }
+
+  // Fetch approved blogs
+  const allBlog = await Blog.find(filter).populate("owner");
+
+  // Fetch trending/most read/popular (approved only)
+  const trending = await Blog.find({ status: "approved" })
+    .sort({ createdAt: -1 })
+    .limit(8)
+    .populate("owner");
+
+  const mostReads = await Blog.find({ status: "approved" })
+    .sort({ views: -1 })
+    .limit(8)
+    .populate("owner");
+
+  const popular = await Blog.find({ status: "approved" })
+    .sort({ likes: -1 })
+    .limit(8)
+    .populate("owner");
+
+  const blogs = await Blog.find({ status: "approved" });
+  const allTags = [...new Set(blogs.flatMap(blog => blog.tags))];
+
+  res.render("blogs/index", {
+    allBlog,
+    blogs,
+    search,
+    trending,
+    mostReads,
+    popular,
+    allTags
+  });
 };
 
+// ------------------ All Blogs Page ------------------
 module.exports.index = async (req, res, next) => {
   let { search } = req.query;
 
-  let allBlog;
+  // Filter for approved blogs only
+  let filter = { status: "approved" };
+
   if (search) {
-    // case-insensitive search on title or location (example)
-    allBlog = await Blog.find({
-      $or: [
-        { title: new RegExp(search, "i") },
-        { headContent: new RegExp(search, "i") }
-      ]
-    });
-  } else {
-    allBlog = await Blog.find({});
+    filter.$or = [
+      { title: new RegExp(search, "i") },
+      { headContent: new RegExp(search, "i") }
+    ];
   }
-  const blogs = await Blog.find({});
+
+  const allBlog = await Blog.find(filter).populate("owner");
+  const blogs = await Blog.find({ status: "approved" }).populate("owner");
+
   res.render("blogs/allBlogs", { allBlog, blogs, search });
 };
 
@@ -283,39 +307,57 @@ module.exports.renderEditForm = async (req, res, next) => {
 
 module.exports.createBlog = async (req, res) => {
   try {
-    const { newTag } = req.body;
-    let { blog } = req.body;
+    const { blog, newTag } = req.body;
 
-    // If user entered a new tag, add it to enum if not already present
-    if (newTag && !Blog.schema.path("tags").caster.enumValues.includes(newTag)) {
-      Blog.schema.path("tags").caster.enumValues.push(newTag);
-      blog.tags = blog.tags ? [...blog.tags, newTag] : [newTag];
+    // Ensure tags are always in array format
+    if (!blog.tags) blog.tags = [];
+    else if (!Array.isArray(blog.tags)) blog.tags = [blog.tags];
+
+    // Parse new tags (JSON string sent from hidden input)
+    let newTagsArray = [];
+    try {
+      newTagsArray = JSON.parse(newTag || "[]");
+    } catch (err) {
+      newTagsArray = [];
     }
 
-    // Create the blog with "pending" status initially
+    // Merge new tags into existing tags
+    newTagsArray.forEach(tag => {
+      tag = tag.trim();
+      if (tag && !blog.tags.includes(tag)) {
+        blog.tags.push(tag);
+
+        // Dynamically extend enum for current session
+        const tagPath = Blog.schema.path("tags").caster;
+        if (!tagPath.enumValues.includes(tag)) {
+          tagPath.enumValues.push(tag);
+        }
+      }
+    });
+
+    // Create a new blog document with pending status
     const newBlog = new Blog({
       ...blog,
-      author: req.user._id, // if using passport
-      status: "pending",
+      author: req.user._id, // user who created
+      status: "pending" // waiting for admin approval
     });
 
-    // Save the blog
     await newBlog.save();
-
-    // Create admin notification
-    const notification = new Notification({
+    
+    // Create admin notification for approval
+    await Notification.create({
       type: "blog_approval",
-      message: `New blog "${newBlog.title}" awaiting approval.`,
+      message: `New blog "${newBlog.title}" is awaiting your approval.`,
       blog: newBlog._id,
       createdAt: new Date(),
+      isRead: false,
+      // link: `/blogs/${_.id}`,
     });
-    await notification.save();
-
     req.flash("success", "Blog submitted for admin approval!");
     res.redirect("/blogs");
-  } catch (e) {
-    console.log(e);
-    req.flash("error", "Something went wrong while creating blog.");
+  } catch (err) {
+    console.error("Error creating blog:", err);
+    req.flash("error", "Failed to create blog. Please try again.");
     res.redirect("/blogs/new");
   }
 };

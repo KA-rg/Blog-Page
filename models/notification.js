@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const notificationSchema = new Schema({
   type: {
     type: String,
-    enum: ["BLOG_CREATED", "BLOG_EDITED", "BLOG_DELETED", "REVIEW_ADDED", "REVIEW_DELETED"],
+    enum: ["BLOG_CREATED", "BLOG_EDITED", "BLOG_DELETED", "REVIEW_ADDED", "REVIEW_DELETED", "blog_approval", "blog_approved", "blog_rejected"],
     required: true,
   },
   message: { type: String, required: true },

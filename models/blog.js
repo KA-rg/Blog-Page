@@ -15,10 +15,7 @@ const blogSchema = new Schema({
     filename: String,
     url: String,
   },
-  tags: [{
-    type: String,
-    enum: ["Travel", "Food", "Tech", "Health", "Education", "Sports", "Music", "Culture", "Wellness", "Awareness", "Work", "Technology", "Lifestyle", "Fitness", "Adventure", "Budget"], // fixed list
-  }],
+  tags: [{type: String, trim: true }],
   status: {
     type: String,
     enum: ["pending", "approved", "rejected"],

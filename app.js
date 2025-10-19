@@ -55,7 +55,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 
 // 2. Session + flash (MUST come before passport.session)
-app.use(flash());
 const sessionOptions = {
   secret: "thisshouldbeabettersecret!",
   resave: false,
@@ -68,6 +67,7 @@ const sessionOptions = {
 };
 // If you want real sessions later, uncomment your session setup here
 app.use(session(sessionOptions));
+app.use(flash());
 
 // 3. Passport init
 app.use(passport.initialize());

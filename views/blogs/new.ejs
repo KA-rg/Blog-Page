@@ -1,68 +1,136 @@
 <% layout('layouts/boilerplate') %>
 
+<style>
+  .tag-pill {
+    background-color: #212529;
+    color: white;
+    border-radius: 20px;
+    padding: 5px 12px;
+    display: inline-flex;
+    align-items: center;
+    margin: 3px;
+  }
+  .tag-pill button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-weight: bold;
+    margin-left: 6px;
+    cursor: pointer;
+  }
+</style>
+
 <body>
   <div class="row">
     <div class="col-8 offset-2">
-       <h3>Create a new blog</h3>
-       <br>
-  <form method="POST" action="/blogs" novalidate class="needs-validation" enctype="multipart/form-data">
-    <!-- Title -->
-    <div class="mb-3">
-      <label for="title" class="form-label">Title</label>
-      <input name="blog[title]" placeholder="enter title" class="form-control" required>
-    </div>
+      <h3>Create a new blog</h3>
+      <br>
+      <form method="POST" action="/blogs" enctype="multipart/form-data" novalidate class="needs-validation">
+        
+        <!-- Title -->
+        <div class="mb-3">
+          <label for="title" class="form-label">Title</label>
+          <input name="blog[title]" class="form-control" placeholder="enter title" required>
+        </div>
 
-    <!-- Head Content -->
-    <div class="mb-3">
-      <label for="headContent" class="form-label">Head Content</label>
-      <textarea name="blog[headContent]" placeholder="enter content which will appear on main page" class="form-control" required></textarea>
-    </div>
+        <!-- Head Content -->
+        <div class="mb-3">
+          <label for="headContent" class="form-label">Head Content</label>
+          <textarea name="blog[headContent]" class="form-control" placeholder="short content for main page" required></textarea>
+        </div>
 
-    <!-- Content -->
-    <div class="mb-3">
-      <label for="content" class="form-label">Content</label>
-      <textarea name="blog[content]" rows="13" placeholder="enter content in detail" class="form-control" required></textarea>
-    </div>
+        <!-- Content -->
+        <div class="mb-3">
+          <label for="content" class="form-label">Content</label>
+          <textarea name="blog[content]" rows="10" class="form-control" placeholder="enter detailed content" required></textarea>
+        </div>
 
-    <!-- Image -->
-    <div class="mb-3">
-      <label for="image" class="form-label">Upload blog image</label>
-      <input name="blog[image]" type="file" class="form-control" required>
-    </div>
+        <!-- Image -->
+        <div class="mb-3">
+          <label for="image" class="form-label">Upload blog image</label>
+          <input name="blog[image]" type="file" class="form-control" required>
+        </div>
 
-    <!-- Tags -->
-    <div class="mb-3">
-      <label class="form-label">Select Existing Tags</label>
-      <div class="d-flex flex-wrap gap-3">
-        <% tagEnum.forEach(tag => { %>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="blog[tags]" value="<%= tag %>" id="tag-<%= tag %>">
-            <label class="form-check-label" for="tag-<%= tag %>"><%= tag %></label>
+        <!-- Existing Tags -->
+        <div class="mb-3">
+          <label class="form-label">Select Existing Tags</label>
+          <div class="d-flex flex-wrap gap-3">
+            <% tagEnum.forEach(tag => { %>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="blog[tags]" value="<%= tag %>" id="tag-<%= tag %>">
+                <label class="form-check-label" for="tag-<%= tag %>"><%= tag %></label>
+              </div>
+            <% }) %>
           </div>
-        <% }) %>
-      </div>
+        </div>
+
+        <!-- Add New Tags -->
+        <div class="mb-3">
+          <label class="form-label">Add New Tags (max 3)</label>
+          <div class="input-group mb-2">
+            <input type="text" id="newTagInput" class="form-control" placeholder="Enter new tag">
+            <button type="button" id="addTagBtn" class="btn btn-dark">Add</button>
+          </div>
+          <div id="newTagsContainer"></div>
+        </div>
+
+        <!-- Hidden input to store new tags -->
+        <input type="hidden" name="newTag" id="hiddenNewTags">
+
+        <!-- Country + Author -->
+        <div class="row">
+          <div class="mb-3 col-md-8">
+            <label for="country" class="form-label">Country</label>
+            <input name="blog[country]" class="form-control" placeholder="enter country" required>
+          </div>
+          <div class="mb-3 col-md-4">
+            <label for="author" class="form-label">Author</label>
+            <input name="blog[author]" class="form-control" placeholder="enter author's name" required>
+          </div>
+        </div>
+
+        <button class="btn btn-dark">Add Blog</button>
+        <br><br>
+      </form>
     </div>
-
-    <!-- New Tag Input -->
-    <div class="mb-3">
-      <label for="newTag" class="form-label">Add New Tag</label>
-      <input name="newTag" id="newTag" placeholder="Enter new tag (optional)" class="form-control">
-    </div>
-
-    <div class="row">
-      <div class="mb-3 col-md-8">
-        <label for="country" class="form-label">Country</label>
-        <input name="blog[country]" id="country" placeholder="enter country" class="form-control" required>
-      </div>
-
-      <div class="mb-3 col-md-4">
-        <label for="author" class="form-label">Author</label>
-        <input name="blog[author]" placeholder="enter author's name" class="form-control" required>
-      </div>
-    </div>
-
-    <button class="btn btn-dark add-btn">Add</button>
-  </form>
   </div>
-  </div>
+
+  <script>
+    const newTagInput = document.getElementById('newTagInput');
+    const addTagBtn = document.getElementById('addTagBtn');
+    const newTagsContainer = document.getElementById('newTagsContainer');
+    const hiddenNewTags = document.getElementById('hiddenNewTags');
+
+    let newTags = [];
+
+    addTagBtn.addEventListener('click', () => {
+      const tagValue = newTagInput.value.trim();
+
+      if (!tagValue) return alert('Please enter a tag name.');
+      if (newTags.includes(tagValue)) return alert('Tag already added.');
+      if (newTags.length >= 3) return alert('You can add up to 3 new tags only.');
+
+      newTags.push(tagValue);
+      updateTagsUI();
+      newTagInput.value = '';
+    });
+
+    function updateTagsUI() {
+      newTagsContainer.innerHTML = '';
+      newTags.forEach(tag => {
+        const tagElement = document.createElement('div');
+        tagElement.className = 'tag-pill';
+        tagElement.innerHTML = `
+          ${tag} <button type="button" onclick="removeTag('${tag}')">&times;</button>
+        `;
+        newTagsContainer.appendChild(tagElement);
+      });
+      hiddenNewTags.value = JSON.stringify(newTags); // send to backend as JSON
+    }
+
+    function removeTag(tag) {
+      newTags = newTags.filter(t => t !== tag);
+      updateTagsUI();
+    }
+  </script>
 </body>

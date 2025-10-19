@@ -5,11 +5,15 @@ module.exports.blogSchema = Joi.object({
     title: Joi.string().required(),
     headContent: Joi.string().required(),
     content: Joi.string().required(),
+    image: Joi.string().allow(""),
     country: Joi.string().required(),
     author: Joi.string().required(),
-    image: Joi.string().allow("", null),
-    tags: Joi.array().items(Joi.string())
-  }).required()
+    tags: Joi.alternatives().try(
+      Joi.array().items(Joi.string()),
+      Joi.string()
+    )
+  }).required(),
+  newTag: Joi.string().allow("") // ✅ add this line
 });
 
 module.exports.reviewSchema = Joi.object({
