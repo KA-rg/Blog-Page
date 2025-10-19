@@ -44,7 +44,7 @@
         <!-- Tags -->
         <div class="mb-3">
           <label class="form-label">Select Tags</label>
-          <div class="d-flex flex-wrap gap-3">
+          <div class="d-flex flex-wrap gap-3 mb-2" id="tag-checkboxes">
             <% tagEnum.forEach(tag => { %>
               <div class="form-check">
                 <input
@@ -60,6 +60,11 @@
               </div>
             <% }) %>
           </div>
+
+          <!-- New Tags Input -->
+          <input type="text" id="newTagInput" class="form-control mb-2" placeholder="Add new tag (max 3)">
+          <div class="d-flex flex-wrap gap-2" id="newTagsContainer"></div>
+          <input type="hidden" name="newTag" id="newTagHidden">
         </div>
 
         <!-- Country + Author row -->
@@ -87,4 +92,69 @@
       </form>
     </div>
   </div>
+
+  <script>
+    const newTagInput = document.getElementById("newTagInput");
+    const newTagsContainer = document.getElementById("newTagsContainer");
+    const newTagHidden = document.getElementById("newTagHidden");
+
+    let newTags = [];
+
+    // Initialize existing new tags if editing (optional)
+    <% if(blog.tags) { %>
+      <% blog.tags.forEach(tag => { %>
+        if(!<%- JSON.stringify(tagEnum) %>.includes("<%= tag %>")){
+          newTags.push("<%= tag %>");
+        }
+      <% }) %>
+    <% } %>
+    updateHiddenInput();
+
+    newTagInput.addEventListener("keypress", function(e){
+      if(e.key === "Enter"){
+        e.preventDefault();
+        addNewTag(newTagInput.value.trim());
+        newTagInput.value = "";
+      }
+    });
+
+    function addNewTag(tag){
+      if(!tag) return;
+      if(newTags.includes(tag)) return;
+      if(newTags.length >= 3){
+        alert("You can only add up to 3 new tags");
+        return;
+      }
+
+      newTags.push(tag);
+      renderNewTags();
+      updateHiddenInput();
+    }
+
+    function removeTag(tag){
+      newTags = newTags.filter(t => t !== tag);
+      renderNewTags();
+      updateHiddenInput();
+    }
+
+    function renderNewTags(){
+      newTagsContainer.innerHTML = "";
+      newTags.forEach(tag => {
+        const div = document.createElement("div");
+        div.classList.add("badge", "bg-primary", "me-2", "mb-1");
+        div.style.cursor = "pointer";
+        div.textContent = tag + " ✕";
+        div.onclick = () => removeTag(tag);
+        newTagsContainer.appendChild(div);
+      });
+    }
+
+    function updateHiddenInput(){
+      newTagHidden.value = JSON.stringify(newTags);
+      renderNewTags();
+    }
+
+    // Initial render
+    renderNewTags();
+  </script>
 </body>

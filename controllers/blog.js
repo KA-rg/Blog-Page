@@ -265,27 +265,6 @@ module.exports.showBlog = async (req, res, next) => {
   }
 };
 
-module.exports.updateBlog = async (req,res,next) => {
-  let { id } = req.params;
-  let blog = await Blog.findByIdAndUpdate(id, {...req.body.blog});
-
-  if(typeof req.file !== "undefined") {
-    let url = req.file.path;
-    let filename = req.file.filename;
-    blog.image = { url, filename };
-    await blog.save();
-  }
-  // ✅ Create admin notification
-    await Notification.create({
-      type: "BLOG_EDITED",
-      message: `${req.user.username} updated the blog: ${blog.title}`,
-      blog: blog._id,
-      link: `/blogs/${blog._id}`
-    });
-  req.flash("success", "Blog Updated!");
-  res.redirect(`/blogs/${id}`);
-};
-
 module.exports.renderEditForm = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -296,12 +275,82 @@ module.exports.renderEditForm = async (req, res, next) => {
       return res.redirect("/blogs");
     }
 
-    let originalImageUrl = blog.image.url;
-    originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_25,h_25");
+    // Get existing enum values from schema
+    const tagEnum = Blog.schema.path("tags").caster.enumValues;
 
-    res.render("blogs/edit.ejs", { blog, originalImageUrl });
+    // Include any existing tags that are not in tagEnum (dynamic tags)
+    blog.tags.forEach(tag => {
+      if (!tagEnum.includes(tag)) tagEnum.push(tag);
+    });
+
+    let originalImageUrl = blog.image?.url || "";
+    if (originalImageUrl) {
+      originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_25,h_25");
+    }
+
+    res.render("blogs/edit", { blog, tagEnum, originalImageUrl });
   } catch (err) {
     next(err);
+  }
+};
+
+module.exports.updateBlog = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { blog, newTag } = req.body;
+
+    // Ensure tags array exists
+    if (!blog.tags) blog.tags = [];
+    else if (!Array.isArray(blog.tags)) blog.tags = [blog.tags];
+
+    // Parse new tags from JSON string
+    let newTagsArray = [];
+    try {
+      newTagsArray = JSON.parse(newTag || "[]");
+    } catch (err) {
+      newTagsArray = [];
+    }
+
+    // Merge new tags into blog.tags and update enum
+    newTagsArray.forEach(tag => {
+      tag = tag.trim();
+      if (tag && !blog.tags.includes(tag)) {
+        blog.tags.push(tag);
+
+        const tagPath = Blog.schema.path("tags").caster;
+        if (!tagPath.enumValues.includes(tag)) {
+          tagPath.enumValues.push(tag);
+        }
+      }
+    });
+
+    // Update blog
+    let updatedBlog = await Blog.findByIdAndUpdate(id, blog, { new: true });
+
+    // Handle new image if uploaded
+    if (req.file) {
+      const url = req.file.path;
+      const filename = req.file.filename;
+      updatedBlog.image = { url, filename };
+      await updatedBlog.save();
+    }
+
+    // Admin notification
+    await Notification.create({
+      type: "BLOG_EDITED",
+      message: `${req.user.username} updated the blog: ${updatedBlog.title}`,
+      blog: updatedBlog._id,
+      link: `/blogs/${updatedBlog._id}`,
+      createdAt: new Date(),
+      isRead: false
+    });
+
+    req.flash("success", "Blog Updated!");
+    res.redirect(`/blogs/${id}`);
+  } catch (err) {
+    console.error("Error updating blog:", err);
+    req.flash("error", "Failed to update blog. Please try again.");
+    res.redirect(`/blogs/${req.params.id}/edit`);
   }
 };
 
@@ -337,10 +386,10 @@ module.exports.createBlog = async (req, res) => {
 
     // Create a new blog document with pending status
     const newBlog = new Blog({
-      ...blog,
-      author: req.user._id, // user who created
-      status: "pending" // waiting for admin approval
-    });
+  ...blog,
+  author: req.user._id,
+  status: req.user._id.toString() === process.env.ADMIN_ID ? "approved" : "pending" // ✅ auto-approve if admin
+});
 
     await newBlog.save();
     
@@ -353,7 +402,12 @@ module.exports.createBlog = async (req, res) => {
       isRead: false,
       // link: `/blogs/${_.id}`,
     });
-    req.flash("success", "Blog submitted for admin approval!");
+    req.flash(
+  "success",
+  newBlog.status === "approved"
+    ? "Blog created and automatically approved!"
+    : "Blog submitted for admin approval!"
+);
     res.redirect("/blogs");
   } catch (err) {
     console.error("Error creating blog:", err);
