@@ -32,8 +32,8 @@ const { setNotificationCount } = require("./middleware");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 
-// const dbUrl = process.env.ATLASDB_URL;
-const dbUrl = "mongodb://localhost:27017/failStory";
+const dbUrl = process.env.ATLASDB_URL;
+// const dbUrl = "mongodb://localhost:27017/failStory";
 main()
 .then(() => {
   console.log("connection to DB");

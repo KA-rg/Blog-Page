@@ -1,0 +1,21 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container my-5">
+  <div class="col-md-6 mx-auto card p-4 shadow rounded-4">
+    <h3 class="text-center text-primary fw-bold mb-3">Complete Your Signup</h3>
+
+    <form action="/signup" method="POST" novalidate>
+      <input type="hidden" name="email" value="<%= email %>">
+
+      <div class="mb-3">
+        <input type="text" name="username" class="form-control" placeholder="Choose Username" required>
+      </div>
+
+      <div class="mb-3">
+        <input type="password" name="password" class="form-control" placeholder="Create Password" required>
+      </div>
+
+      <button class="btn btn-primary w-100">Create Account</button>
+    </form>
+  </div>
+</div>

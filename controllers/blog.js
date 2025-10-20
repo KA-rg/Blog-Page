@@ -144,9 +144,6 @@ res.render("blogs/new", { tagEnum, blog: { tags: [] } });
 
 module.exports.likeBlog = async (req, res) => {
   try {
-    console.log("Like route hit:", req.params.id);
-    console.log("User:", req.user);
-
     const blog = await Blog.findById(req.params.id);
     if (!blog) {
       console.log("❌ Blog not found");

@@ -14,7 +14,7 @@ const userSchema = new Schema({
   
   resendCount: { type: Number, default: 0 },
   lastOTPTime: Date,
-
+  username: String,
 
   // --- For Email Verification ---
   isVerified: { type: Boolean, default: false },
