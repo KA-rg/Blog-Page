@@ -56,7 +56,7 @@ app.use(methodOverride("_method"));
 
 // 2. Session + flash (MUST come before passport.session)
 const sessionOptions = {
-  secret: "thisshouldbeabettersecret!",
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
   store: MongoStore.create({ mongoUrl: dbUrl, touchAfter: 24 * 3600 }),
