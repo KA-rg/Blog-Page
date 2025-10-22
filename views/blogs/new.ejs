@@ -48,7 +48,9 @@
         <!-- Image -->
         <div class="mb-3">
           <label for="image" class="form-label">Upload blog image</label>
-          <input name="blog[image]" type="file" class="form-control" required>
+          <input name="blog[image]" id="image" type="file" class="form-control" required>
+          <small class="text-muted">File size must be less than 1MB.</small>
+          <div id="fileError" class="text-danger mt-1" style="display:none;">File size exceeds 1MB. Please upload a smaller image.</div>
         </div>
 
         <!-- Existing Tags -->
@@ -89,7 +91,7 @@
           </div>
         </div>
 
-        <button class="btn btn-dark">Add Blog</button>
+        <button class="btn btn-dark">Send for approval</button>
         <br><br>
       </form>
     </div>
@@ -133,4 +135,16 @@
       updateTagsUI();
     }
   </script>
+<script>
+  document.getElementById('image').addEventListener('change', function() {
+    const file = this.files[0];
+    const errorDiv = document.getElementById('fileError');
+    if (file && file.size > 1024 * 1024) { // 1MB = 1024 * 1024 bytes
+      errorDiv.style.display = 'block';
+      this.value = ''; // clear invalid file
+    } else {
+      errorDiv.style.display = 'none';
+    }
+  });
+</script>
 </body>
