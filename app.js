@@ -30,7 +30,7 @@ const adminRoutes = require("./routes/admin");
 const blogController = require("./controllers/blog.js");
 const { setNotificationCount } = require("./middleware");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-
+const multer = require("multer");
 
 const dbUrl = process.env.ATLASDB_URL;
 // const dbUrl = "mongodb://localhost:27017/failStory";
@@ -181,6 +181,18 @@ app.listen(port, () => {
 });
 
 app.get("/", blogController.home);
+
+// ⚠️ Handle file upload errors
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+    req.flash("error", "Image size must be less than 1 MB!");
+    return res.redirect("back");
+  } else if (err.message === "Only JPG, PNG, or WEBP files are allowed") {
+    req.flash("error", err.message);
+    return res.redirect("back");
+  }
+  next(err);
+});
 
 // 7. Catch-all for undefined routes
 app.all(/.*/, (req, res, next) => {

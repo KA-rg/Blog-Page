@@ -4,8 +4,8 @@ const wrapAsync = require("../utils/wrapAsync.js");
 const { isLoggedIn, validateBlog, isOwner  } = require("../middleware.js");
 const blogController = require("../controllers/blog.js");
 const multer = require("multer");
-const { storage } = require("../cloudConfig.js");
-const upload = multer({ storage });
+// const upload = multer({ storage });
+const { storage, upload } = require("../cloudConfig.js");
 
 router.post("/:id/like", isLoggedIn, blogController.likeBlog); // 👈 Like route
 
