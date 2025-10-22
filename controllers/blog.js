@@ -1,7 +1,7 @@
 const { isOwner } = require("../middleware");
 const Blog = require("../models/blog");
 const Notification = require("../models/notification");
-
+const cloudinary = require("cloudinary").v2;
 
 // 📂 Show blogs by tag
 module.exports.category = async (req, res) => {
@@ -255,7 +255,8 @@ module.exports.showBlog = async (req, res, next) => {
   // Previous and next blogs
   const prevBlog = index > 0 ? blogs[index - 1] : null;
   const nextBlog = index < blogs.length - 1 ? blogs[index + 1] : null;
-  
+  // console.log(req.user._id.toString());
+  // console.log(process.env.ADMIN_ID);
     res.render("blogs/show", { blog, blogs, prevBlog, nextBlog, currUser: req.user, ADMIN_ID: process.env.ADMIN_ID});
   } catch (err) {
     next(err);
@@ -380,11 +381,13 @@ module.exports.createBlog = async (req, res) => {
         }
       }
     });
-
+    let url = req.file.path;
+    let filename = req.file.filename;
     // Create a new blog document with pending status
     const newBlog = new Blog({
   ...blog,
-  author: req.user._id,
+  image: { url, filename },
+  owner: req.user._id,
   status: req.user._id.toString() === process.env.ADMIN_ID ? "approved" : "pending" // ✅ auto-approve if admin
 });
 
@@ -413,17 +416,37 @@ module.exports.createBlog = async (req, res) => {
   }
 };
 
-module.exports.destroyBlog = async (req,res,next) => {
-  let { id } = req.params;
-  let deletedBlog = await Blog.findByIdAndDelete(id);
-  req.flash("success", "Blog deleted Successfully!");
-      // ✅ Create admin notification
-      await Notification.create({
-        type: "BLOG_DELETED",
-        message: `Blog titled "${deletedBlog.title}" was deleted`,
-        blog: deletedBlog._id,
-        link: `/notifications`
-      });
-      req.flash("success", "blog has been deleted");
-  res.redirect("/blogs");
+module.exports.destroyBlog = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deletedBlog = await Blog.findById(id);
+
+    if (!deletedBlog) {
+      req.flash("error", "Blog not found!");
+      return res.redirect("/blogs");
+    }
+
+    // 🧹 Delete image from Cloudinary if exists
+    if (deletedBlog.image && deletedBlog.image.filename) {
+      await cloudinary.uploader.destroy(deletedBlog.image.filename);
+    }
+
+    // 🗑️ Delete blog from database
+    await Blog.findByIdAndDelete(id);
+
+    // 📨 Create admin notification
+    await Notification.create({
+      type: "BLOG_DELETED",
+      message: `Blog titled "${deletedBlog.title}" was deleted`,
+      blog: deletedBlog._id,
+      link: `/notifications`,
+    });
+
+    req.flash("success", "Blog deleted successfully!");
+    res.redirect("/blogs");
+  } catch (err) {
+    console.error("Error deleting blog:", err);
+    req.flash("error", "Failed to delete blog. Please try again.");
+    res.redirect("/blogs");
+  }
 };
