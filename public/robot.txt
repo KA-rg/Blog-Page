@@ -1,0 +1,5 @@
+User-agent: *
+Disallow:
+
+Sitemap: https://failstory.onrender.com/sitemap.xml
+Host: https://failstory.onrender.com

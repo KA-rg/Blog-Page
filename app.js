@@ -31,6 +31,7 @@ const blogController = require("./controllers/blog.js");
 const { setNotificationCount } = require("./middleware");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const multer = require("multer");
+const sitemapRouter = require('./routes/sitemap');
 
 const dbUrl = process.env.ATLASDB_URL;
 // const dbUrl = "mongodb://localhost:27017/failStory";
@@ -170,6 +171,7 @@ app.use((req, res, next) => {
 
 // 6. Routers
 app.use("/blogs", blogRouter);
+app.use('/', sitemapRouter);
 app.use("/blogs/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 app.use("/notifications", notificationRouter);
