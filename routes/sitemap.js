@@ -1,13 +1,12 @@
 // routes/sitemap.js
 const express = require('express');
 const router = express.Router();
-const { createSitemap } = require('sitemap'); // v7+ uses createSitemap? (if not, see alternative below)
-const Blog = require('../models/blog'); // adjust path
+const Blog = require('../models/blog');
 
 router.get('/sitemap.xml', async (req, res, next) => {
   try {
     const baseUrl = 'https://failstory.onrender.com';
-    const posts = await Blog.find({ status: 'approved' }).select('slug updatedAt createdAt').lean();
+    const posts = await Blog.find({ status: 'approved' }).select('_id updatedAt createdAt').lean();
 
     const urls = [
       { url: '/', changefreq: 'daily', priority: 1.0, lastmodISO: new Date().toISOString() },
@@ -16,14 +15,13 @@ router.get('/sitemap.xml', async (req, res, next) => {
 
     posts.forEach(p => {
       urls.push({
-        url: `/blogs/${p.slug}`, // or the URL pattern you use
+        url: `/blogs/${p._id}`, // ✅ using _id instead of slug
         lastmodISO: (p.updatedAt || p.createdAt || new Date()).toISOString(),
         changefreq: 'weekly',
         priority: 0.8
       });
     });
 
-    // Build sitemap XML manually (works without extra sitemap libs)
     const xmlItems = urls.map(u => {
       const lastmod = u.lastmodISO ? `<lastmod>${u.lastmodISO}</lastmod>` : '';
       return `
