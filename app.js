@@ -177,6 +177,8 @@ Allow: /
 Sitemap: https://failstory.onrender.com/sitemap.xml`);
 });
 
+app.get("/", blogController.home);
+
 // 6. Routers
 app.use("/blogs", blogRouter);
 app.use('/', sitemapRouter);
@@ -189,8 +191,6 @@ port = 8080;
 app.listen(port, () => { 
   console.log(`app is listening to port:${port}`);
 });
-
-app.get("/", blogController.home);
 
 // ⚠️ Handle file upload errors
 app.use((err, req, res, next) => {
