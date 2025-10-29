@@ -1,3 +1,16 @@
+<head>
+  <title><%= blog.title %> | failSTORY</title>
+  <meta name="description" content="<%= blog.description || 'Read this failSTORY blog about resilience and growth.' %>">
+  <meta name="keywords" content="failstory, blogs, <%= blog.title %>, inspiration, life stories">
+  
+  <meta property="og:title" content="<%= blog.title %> | failSTORY">
+  <meta property="og:description" content="<%= blog.headContent || 'Read this inspiring failSTORY.' %>">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://failstory.onrender.com/blogs/<%= blog._id %>">
+  <meta property="og:image" content="<%= blog.image?.url || 'https://failstory.onrender.com/images/default-cover.jpg' %>">
+</head>
+
+
 <% layout('layouts/boilerplate') %>
 
 <div class="container my-5">
