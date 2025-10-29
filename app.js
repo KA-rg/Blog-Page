@@ -169,6 +169,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+  res.send(`User-agent: *
+Allow: /
+
+Sitemap: https://failstory.onrender.com/sitemap.xml`);
+});
+
 // 6. Routers
 app.use("/blogs", blogRouter);
 app.use('/', sitemapRouter);
