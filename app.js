@@ -32,6 +32,14 @@ const { setNotificationCount } = require("./middleware");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const multer = require("multer");
 const sitemapRouter = require('./routes/sitemap');
+const aboutRoutes = require("./routes/about");
+
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+  res.send(`User-agent: *
+Allow: /
+Sitemap: https://failstory.onrender.com/sitemap.xml`);
+});
 
 const dbUrl = process.env.ATLASDB_URL;
 // const dbUrl = "mongodb://localhost:27017/failStory";
@@ -169,14 +177,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/robots.txt", (req, res) => {
-  res.type("text/plain");
-  res.send(`User-agent: *
-Allow: /
-
-Sitemap: https://failstory.onrender.com/sitemap.xml`);
-});
-
 app.get("/", blogController.home);
 
 // 6. Routers
@@ -186,6 +186,7 @@ app.use("/blogs/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 app.use("/notifications", notificationRouter);
 app.use("/admin", adminRoutes);
+app.use("/about", aboutRoutes);
 
 port = 8080; 
 app.listen(port, () => { 

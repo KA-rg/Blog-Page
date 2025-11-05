@@ -1,0 +1,194 @@
+<% layout('layouts/boilerplate') %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About | FailStory</title>
+    <meta
+      name="description"
+      content="Learn about FailStory — a storytelling startup founded by Sarthak Jain and developed by Krish Jain at IIT BHU. Discover how we turn real-life failures into lessons that inspire growth and resilience."
+    />
+
+    <!-- ✅ Open Graph Tags -->
+    <meta property="og:title" content="About FailStory | Real Stories of Failure and Growth" />
+    <meta
+      property="og:description"
+      content="FailStory, founded by Sarthak Jain, is a storytelling platform that celebrates failure as the foundation of success. Built and developed by Krish Jain at IIT BHU."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://failstory.onrender.com/about" />
+    <meta property="og:image" content="https://failstory.onrender.com/images/failstory-banner.jpg" />
+
+    <!-- ✅ Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="About FailStory | Founded by Sarthak Jain" />
+    <meta
+      name="twitter:description"
+      content="FailStory is a digital storytelling startup celebrating failure and resilience. Founded by Sarthak Jain and developed by Krish Jain at IIT BHU."
+    />
+    <meta name="twitter:image" content="https://failstory.onrender.com/images/failstory-banner.jpg" />
+
+    <!-- ✅ JSON-LD Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "FailStory",
+        "url": "https://failstory.onrender.com",
+        "logo": "https://failstory.onrender.com/images/failstory-logo.png",
+        "founder": {
+          "@type": "Person",
+          "name": "Sarthak Jain",
+          "jobTitle": "Founder & Editor"
+        },
+        "employee": {
+          "@type": "Person",
+          "name": "Krish Jain",
+          "jobTitle": "Lead Developer",
+          "affiliation": {
+            "@type": "CollegeOrUniversity",
+            "name": "IIT BHU"
+          }
+        },
+        "sameAs": [
+          "https://www.linkedin.com/in/sarthak-jain",
+          "https://www.linkedin.com/in/krish-jain"
+        ],
+        "description": "FailStory is a storytelling startup that celebrates lessons learned from failure. Founded by Sarthak Jain and developed by Krish Jain."
+      }
+    </script>
+
+    <link rel="stylesheet" href="/styles.css" />
+    <style>
+      .about-section {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+        line-height: 1.8;
+      }
+      .team-section {
+        background: #fafafa;
+        padding: 3rem 2rem;
+        text-align: center;
+      }
+      .team-section h2 {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+      }
+      .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        justify-items: center;
+      }
+      .team-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        max-width: 300px;
+        text-align: center;
+        transition: all 0.3s ease;
+      }
+      .team-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+      .team-card img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 1rem;
+      }
+      .team-card h3 {
+        margin-bottom: 0.3rem;
+        font-size: 1.2rem;
+      }
+      .team-card p {
+        font-size: 0.95rem;
+        color: #555;
+      }
+      .team-social a {
+        margin: 0 6px;
+        color: #0077b5;
+        text-decoration: none;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <main class="container">
+      <section class="about-section">
+        <h1>About FailStory</h1>
+
+        <p>
+          Welcome to <strong>FailStory</strong> — a space where honesty meets inspiration.
+          This platform is owned and founded by <strong>Sarthak Jain</strong>, an
+          entrepreneur and creative thinker passionate about building meaningful digital
+          communities. I’m <strong>Krish Jain</strong>, a student at
+          <strong>IIT BHU</strong> and the lead web developer behind the project, working
+          closely with Sarthak to bring this vision to life. Together, we built FailStory
+          with a simple mission — to change the way people look at failure. <br /><br />
+          FailStory was born from the belief that every setback is a lesson waiting to be
+          shared. Instead of hiding our mistakes, we wanted to create a platform where
+          people can talk about them openly, learn from one another, and grow stronger as
+          a community. Every story published here is reviewed and curated by
+          <strong>Sarthak Jain</strong>, ensuring that FailStory remains a genuine,
+          high-quality space for real human experiences. <br /><br />
+          Our goal is to redefine failure as a stepping stone toward growth — whether
+          you’re a student, a startup founder, or someone finding your path. Through open
+          storytelling, personal reflection, and shared learning, FailStory aims to
+          inspire resilience, self-belief, and the courage to keep moving forward.
+          <br /><br />
+          Built with modern web technologies and designed for simplicity, FailStory
+          represents more than just a website — it’s a startup driven by authenticity,
+          collaboration, and heart. We believe that failure is not the opposite of
+          success but its foundation, and every shared story brings us one step closer to
+          understanding that truth.
+        </p>
+      </section>
+
+      <!-- 👥 Meet the Team Section -->
+      <section class="team-section">
+        <h2>Meet the Team</h2>
+        <div class="team-grid">
+          <div class="team-card">
+            <img src="" alt="Sarthak Jain - Founder & Editor" />
+            <h3>Sarthak Jain</h3>
+            <p><strong>Founder & Editor</strong></p>
+            <p>
+              The visionary behind FailStory, Sarthak believes in turning challenges into
+              opportunities. As the founder and editor, he ensures every story reflects
+              honesty, emotion, and inspiration.
+            </p>
+            <div class="team-social">
+              <a href="https://www.linkedin.com/in/sarthak-jain-3100b5293/" target="_blank">LinkedIn</a>
+              <a href="mailto:failstory552@gmail.com">Email</a>
+            </div>
+          </div>
+
+          <div class="team-card">
+            <img src="" alt="Krish Jain - Lead Developer" />
+            <h3>Krish Jain</h3>
+            <p><strong>Lead Developer</strong></p>
+            <p>
+              A student at IIT BHU and tech enthusiast, Krish developed FailStory’s
+              platform using modern web technologies. He focuses on creating seamless
+              digital experiences that amplify real stories.
+            </p>
+            <div class="team-social">
+              <a href="https://www.linkedin.com/in/krish-jain-2609jain/" target="_blank">LinkedIn</a>
+              <a href="mailto:krishjain2609@gmail.com/">Email</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+  </body>
+</html>
